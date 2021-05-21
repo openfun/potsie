@@ -1,6 +1,80 @@
 # Potsie
 
-Potsie is a collection of Grafana dashboards for learning analytics.
+Potsie is a collection of [Grafana](https://grafana.com/grafana/) dashboards
+for learning analytics.
+
+## Getting started
+
+Once you have cloned this project, bootstrapping it should be as easy as typing
+the following command from your terminal:
+
+```
+$ make bootstrap
+```
+
+Now you are ready to fire up grafana using:
+
+```
+$ make run
+```
+
+After a few seconds, the application should be running at
+[localhost:3000](http://localhost:3000). Default admin credentials are
+`admin:pass`. Once logged in, running grafana instance should be provisioned
+with all dashboards versioned in this repository.
+
+## Developer guide
+
+### Working on dashboards
+
+Potsie dashboards are written using the [Jsonnet templating
+language](https://jsonnet.org) with the help of the [grafonnet
+library](https://github.com/grafana/grafonnet-lib). Sources are stored in the
+`src/` directory and should be compiled to plain JSON before being sent to
+grafana.
+
+Sources compilation can be done using the _ad hoc_ command:
+
+```
+$ make compile
+```
+
+Once compiled, our `potsie` provisioner (see
+[potsie.yaml](./etc/grafana/provisioning/dashboards/potsie.yaml)) should
+automatically load new or modified dashboards in running grafana instance
+(after at most 3 seconds). You should refresh your web browser to see
+modifications.
+
+> _nota bene_: you can see compiled sources in the `var/lib/grafana/` directory
+> from this repository (look for JSON files).
+
+To automatically compile sources upon saved modifications, we provide a watcher
+that requires to install the
+[inotify-tools](https://github.com/inotify-tools/inotify-tools/wiki) dependency
+for your system. It can be run using:
+
+```
+$ make watch
+```
+
+### Helper scripts
+
+To install new dependencies, you should use the `bin/jb` wrapper script we
+provide. This script uses the [Jsonnet
+Bundler](https://github.com/jsonnet-bundler/jsonnet-bundler), _aka_ `jb`
+package manager to handle project requirements. To list available commands and
+options, use the `--help` flag:
+
+```
+$ bin/jb --help
+```
+
+If you want to play with the Jsonnet compiler, we also provide a wrapper
+script, see:
+
+```
+$ bin/jsonnet --help
+```
 
 ## Contributing
 

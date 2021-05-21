@@ -1,0 +1,44 @@
+version: "3.5"
+
+services:
+  postgresql:
+    image: postgres:13.3
+    env_file:
+      - env.d/postgresql
+
+  grafana:
+    image: grafana/grafana:7.5.7
+    ports:
+      - 3000:3000
+    user: "${DOCKER_USER:-1000}"
+    volumes:
+      - ./etc/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
+      - ./var/lib/grafana/dashboards:/var/lib/grafana/dashboards
+    env_file:
+      - env.d/grafana
+    depends_on:
+      - postgresql
+
+  app:
+    build:
+      context: .
+    image: potsie:development
+    env_file:
+      - env.d/app
+    user: "${DOCKER_USER:-1000}"
+    volumes:
+      - ./src/dashboards:/app/dashboards
+      - ./var/lib/grafana/dashboards:/var/lib/grafana/dashboards
+
+  jb:
+    image: potsie:builder
+    build:
+      context: .
+      target: builder
+    volumes:
+      - ./jsonnetfile.json:/go/jsonnetfile.json
+      - ./jsonnetfile.lock.json:/go/jsonnetfile.lock.json
+    entrypoint: jb
+
+  dockerize:
+    image: jwilder/dockerize
