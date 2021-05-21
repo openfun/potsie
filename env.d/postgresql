@@ -1,0 +1,4 @@
+# Postgresql db container configuration
+POSTGRES_DB=potsie
+POSTGRES_USER=fun
+POSTGRES_PASSWORD=pass

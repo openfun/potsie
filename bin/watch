@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+if ! which inotifywait >& /dev/null; then
+  echo "This script requires to install the inotify-tools dependency!"
+  echo "For installation instructions, refer to the official documentation:"
+  echo "https://github.com/inotify-tools/inotify-tools/wiki"
+  exit 10
+fi
+
+if [[ -z $1 ]] || [[ -z $2 ]]; then
+  echo "Usage: watch <path> <action>"
+  exit 1
+fi
+
+declare watch_path=$1
+declare action=$2
+
+echo "Waiting for changes in ${watch_path}..."
+
+while inotifywait -qre close_write "${watch_path}"
+do
+    ${action}
+    echo -e "\nWaiting for changes in ${watch_path}..."
+done
