@@ -57,7 +57,25 @@ for your system. It can be run using:
 $ make watch
 ```
 
-### Helper scripts
+### Quality checks
+
+To respect Jsonnet standards, we recommend to use official language formatter
+and linter:
+
+```bash
+# Format sources
+$ make format
+
+# Lint sources
+$ make lint
+```
+
+You can also use the `bin/jsonnetfmt` or `bin/jsonnet-lint` helper scripts for
+custom use of the related tools. Adding a Git pre-commit hook script to
+autoformat sources before committing changes would be an example usage of those
+scripts.
+
+### Other helper scripts
 
 To install new dependencies, you should use the `bin/jb` wrapper script we
 provide. This script uses the [Jsonnet

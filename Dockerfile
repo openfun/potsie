@@ -8,6 +8,8 @@ RUN apk add --no-cache git
 
 # Install core dependencies
 RUN go get github.com/google/go-jsonnet/cmd/jsonnet && \
+    go get github.com/google/go-jsonnet/cmd/jsonnet-lint && \
+    go get github.com/google/go-jsonnet/cmd/jsonnetfmt && \
     go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
 
 # Install jsonnet bundles
