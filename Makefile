@@ -52,6 +52,14 @@ down: ## remove stack (warning: it removes the database container)
 	@$(COMPOSE) down
 .PHONY: down
 
+format: ## format Jsonnet sources
+	bin/jsonnetfmt -i $(sources)
+.PHONY: format
+
+lint: ## lint Jsonnet sources
+	bin/jsonnet-lint $(sources)
+.PHONY: lint
+
 logs: ## display grafana logs (follow mode)
 	@$(COMPOSE) logs -f grafana
 .PHONY: logs
