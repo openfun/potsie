@@ -1,0 +1,215 @@
+version: 2
+jobs:
+  # Git jobs
+  # Check that the git history is clean and complies with our expectations
+  lint-git:
+    docker:
+      - image: circleci/python:3.9-buster
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - run:
+          name: Check absence of fixup commits
+          command: |
+            ! git log | grep 'fixup!'
+      - run:
+          name: Install gitlint
+          command: |
+            pip install --user gitlint
+      - run:
+          name: Lint commit messages added to main
+          command: |
+            ~/.local/bin/gitlint --commits origin/main..HEAD
+
+  # Check that the CHANGELOG has been updated in the current branch
+  check-changelog:
+    docker:
+      - image: circleci/buildpack-deps:stretch-scm
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - run:
+          name: Check that the CHANGELOG has been modified in the current branch
+          command: |
+            git whatchanged --name-only --pretty="" origin..HEAD | grep CHANGELOG
+
+  # Check that the CHANGELOG max line length does not exceed 80 characters
+  lint-changelog:
+    docker:
+      - image: debian:stretch
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - run:
+          name: Check CHANGELOG max line length
+          command: |
+            # Get the longuest line width (ignoring release links)
+            test $(cat CHANGELOG.md | grep -Ev "^\[.*\]: https://github.com/openfun" | wc -L) -le 80
+
+  # Build the Docker image used in development
+  build-docker:
+    docker:
+      - image: circleci/buildpack-deps:stretch
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Build development image
+          command: make build
+      - run:
+          name: Check built image availability
+          command: docker images "potsie:*"
+
+  # Compile Jsonnet sources
+  compile:
+    machine:
+      image: ubuntu-2004:202104-01
+      docker_layer_caching: true
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - run:
+          name: Build development image
+          command: make build
+      - run:
+          name: Compile sources
+          command: make compile
+      - persist_to_workspace:
+          root: .
+          paths:
+            - var/
+
+  # Lint Jsonnet sources
+  lint:
+    machine:
+      image: ubuntu-2004:202104-01
+      docker_layer_caching: true
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - run:
+          name: Build production image
+          command: make build
+      - run:
+          name: Format sources
+          command: bin/jsonnetfmt --test $(find src/ -type f -name '*.jsonnet')
+      - run:
+          name: Lint sources
+          command: make lint
+
+  # Make a new github release
+  release:
+    docker:
+      - image: circleci/buildpack-deps:stretch-scm
+    working_directory: ~/fun
+    steps:
+      # Add a deployment key to allow write access to the github repository
+      - add_ssh_keys:
+          fingerprints:
+            - "ca:0c:a4:e2:4a:43:ca:9f:ee:15:cf:99:94:4e:78:38"
+      - checkout
+      - attach_workspace:
+          at: ~/fun
+      - run:
+          name: Install gh CLI
+          command: |
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | \
+              sudo gpg --dearmor -o /usr/share/keyrings/githubcli-archive-keyring.gpg
+            echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | \
+              sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+            sudo apt update
+            sudo apt install gh
+      - run:
+          name: Define release reference
+          command: |
+            echo 'RELEASE=$([[ -z "$CIRCLE_TAG" ]] && echo "latest" || echo "${CIRCLE_TAG}")' >> $BASH_ENV
+            source $BASH_ENV
+      - run:
+          name: Build release archive
+          command: |
+            mkdir releases
+            tar cvzf releases/postie-${RELEASE}.tgz -C ~/fun var/lib/grafana
+      - run:
+          name: Get release changes
+          command: |
+            if [[ "${RELEASE}" == "latest" ]]; then
+              tag="Unreleased" ;
+            else
+              tag="${RELEASE/v/}" ;
+            fi
+            sed -E -n "/^## \[${tag}\]/,/^##\ /{/^## \[${tag}\]/d ;/^##\ /d; p}" CHANGELOG.md > release.md
+      - run:
+          name: Create release on GitHub
+          command: |
+            gh config set prompt disabled
+            if [[ "${RELEASE}" == "latest" ]]; then
+              gh release delete -y "${RELEASE}" || true;
+              git push origin ":${RELEASE}";
+              gh release create -F release.md -p "${RELEASE}" ./releases/*;
+            else
+              if ! gh release list | grep "${RELEASE}"; then
+                gh release create -F release.md "${RELEASE}";
+              fi
+              gh release upload --clobber "${RELEASE}" ./releases/*;
+            fi
+
+workflows:
+  version: 2
+
+  potsie:
+    jobs:
+      # Git jobs
+      #
+      # Check validity of git history
+      - lint-git:
+          filters:
+            tags:
+              only: /.*/
+      # Check CHANGELOG update
+      - check-changelog:
+          filters:
+            branches:
+              ignore: main
+            tags:
+              only: /(?!^v).*/
+      - lint-changelog:
+          filters:
+            branches:
+              ignore: main
+            tags:
+              only: /.*/
+
+      # Build tooling
+      - build-docker:
+          filters:
+            tags:
+              only: /.*/
+
+      # Compile sources
+      - compile:
+          requires:
+            - build-docker
+          filters:
+            tags:
+              only: /.*/
+
+      # Quality checks
+      - lint:
+          requires:
+            - build-docker
+          filters:
+            tags:
+              only: /.*/
+
+      # Release
+      - release:
+          requires:
+            - lint
+            - compile
+          filters:
+            branches:
+              only: main
+            tags:
+              only: /^v.*/
