@@ -147,10 +147,10 @@ jobs:
             if [[ "${RELEASE}" == "latest" ]]; then
               gh release delete -y "${RELEASE}" || true;
               git push origin ":${RELEASE}";
-              gh release create -F release.md -p "${RELEASE}" ./releases/*;
+              gh release create -F release.md -t "${RELEASE}" -p "${RELEASE}" ./releases/*;
             else
               if ! gh release list | grep "${RELEASE}"; then
-                gh release create -F release.md "${RELEASE}";
+                gh release create -F release.md -t "${RELEASE/v/}" "${RELEASE}";
               fi
               gh release upload --clobber "${RELEASE}" ./releases/*;
             fi
