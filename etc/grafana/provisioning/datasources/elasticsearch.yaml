@@ -5,7 +5,7 @@ datasources:
     type: elasticsearch
     editable: false
     access: proxy
-    database: "statements"
+    database: "statements-marsha-*"
     url: http://elasticsearch:9200
     jsonData:
       esVersion: 70
