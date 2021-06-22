@@ -8,8 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [0.1.0] - 2021-06-22
+
 ### Added
 
 - Video details Dashboard
 
-[Unreleased]: https://github.com/openfun/postsie/
+[Unreleased]: https://github.com/openfun/postsie/v0.1.0...main
+[0.1.0]: https://github.com/openfun/postsie/1172535...v0.1.0
