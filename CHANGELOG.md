@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Completion threshold metrics in details Dashboard
+- Complete views, unique complete views panels in details Dashboard
 - Views, unique views and daily views panels in details Dashboard
 
 ### Changed
@@ -22,5 +24,5 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Video details Dashboard
 
-[Unreleased]: https://github.com/openfun/postsie/v0.1.0...main
-[0.1.0]: https://github.com/openfun/postsie/1172535...v0.1.0
+[unreleased]: https://github.com/openfun/potsie/compare/v0.1.0...main
+[0.1.0]: https://github.com/openfun/potsie/compare/1172535...v0.1.0
