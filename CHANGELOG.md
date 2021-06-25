@@ -10,6 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Course video events distribution panel in details Dashboard
 - Completion threshold metrics in details Dashboard
 - Complete views, unique complete views panels in details Dashboard
 - Views, unique views and daily views panels in details Dashboard

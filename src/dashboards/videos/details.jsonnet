@@ -15,6 +15,7 @@ local course_field = 'object.definition.extensions.http://adlnet.gov/expapi/acti
 local result_extensions_time_field = 'result.extensions.https://w3id.org/xapi/video/extensions/time';
 local school_field = 'object.definition.extensions.https://w3id.org/xapi/acrossx/extensions/school.keyword';
 local session_field = 'object.definition.extensions.http://adlnet.gov/expapi/activities/module.keyword';
+local verb_display_en_us_field = 'verb.display.en-US.keyword';
 local video_id_field = 'object.id.keyword';
 local verb_id_completed_value = 'http://adlnet.gov/expapi/verbs/completed';
 local verb_id_initialized_value = 'http://adlnet.gov/expapi/verbs/initialized';
@@ -348,7 +349,7 @@ dashboard.new(
       timeField='timestamp'
     )
   ),
-  gridPos={ x: 9.6, y: 1, w: 12, h: 9 }
+  gridPos={ x: 9.6, y: 1, w: 14.4, h: 9 }
 )
 .addPanel(
   row.new(title='Event distributions', collapse=false),
@@ -397,4 +398,54 @@ dashboard.new(
     )
   ),
   gridPos={ x: 0, y: 8, w: 12, h: 9 }
+)
+.addPanel(
+  graphPanel.new(
+    title='Course video events distribution',
+    description=|||
+      Distribution of events according to their type.
+    |||,
+    datasource=lrs,
+    bars='true',
+    lines='false',
+    x_axis_mode='series',
+  ).addTarget(
+    elasticsearch.target(
+      datasource=lrs,
+      query='%(video_query)s' % {
+        video_query: video_id_query,
+      },
+      metrics=[
+        {
+          id: '1',
+          type: 'count',
+        },
+      ],
+      bucketAggs=[
+        {
+          id: '2',
+          field: verb_display_en_us_field,
+          type: 'terms',
+          settings: {
+            order: 'asc',
+            orderBy: '_term',
+            min_doc_count: '0',
+            size: '0',
+          },
+        },
+        {
+          id: '3',
+          type: 'date_histogram',
+          field: 'timestamp',
+          settings: {
+            interval: 'auto',
+            min_doc_count: '0',
+            trimEdges: '0',
+          },
+        },
+      ],
+      timeField='timestamp'
+    )
+  ),
+  gridPos={ x: 12, y: 8, w: 12, h: 9 }
 )
