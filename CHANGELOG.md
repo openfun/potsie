@@ -8,6 +8,14 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Views, unique views and daily views panels in details Dashboard
+
+### Changed
+
+- Upgrade `Grafana` to 8.0.3
+
 ## [0.1.0] - 2021-06-22
 
 ### Added
