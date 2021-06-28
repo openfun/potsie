@@ -12,6 +12,7 @@ WAIT_GRAFANA         = $(COMPOSE_RUN) dockerize -wait http://grafana:3000 -timeo
 
 # -- Targets
 sources := $(shell find src/ -type f -name '*.jsonnet')
+libraries := $(shell find src/ -type f -name '*.libsonnet')
 targets := $(patsubst src/%.jsonnet,var/lib/grafana/%.json,$(sources))
 
 # -- Plugins
@@ -73,12 +74,12 @@ down: ## remove stack (warning: it removes the database container)
 	@$(COMPOSE) down || echo WARNING: unable to remove the stack. Try to stop linked containers or networks first.
 .PHONY: down
 
-format: ## format Jsonnet sources
-	bin/jsonnetfmt -i $(sources)
+format: ## format Jsonnet sources and libraries
+	bin/jsonnetfmt -i $(sources) $(libraries)
 .PHONY: format
 
-lint: ## lint Jsonnet sources
-	bin/jsonnet-lint $(sources)
+lint: ## lint Jsonnet sources and libraries
+	bin/jsonnet-lint $(sources) $(libraries)
 .PHONY: lint
 
 logs: ## display grafana logs (follow mode)

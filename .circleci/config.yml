@@ -94,7 +94,8 @@ jobs:
           command: make build
       - run:
           name: Format sources
-          command: bin/jsonnetfmt --test $(find src/ -type f -name '*.jsonnet')
+          command: |
+            bin/jsonnetfmt --test $(find src/ -type f -name '*.jsonnet') $(find src/ -type f -name '*.libsonnet')
       - run:
           name: Lint sources
           command: make lint
