@@ -14,6 +14,9 @@ WAIT_GRAFANA         = $(COMPOSE_RUN) dockerize -wait http://grafana:3000 -timeo
 sources := $(shell find src/ -type f -name '*.jsonnet')
 targets := $(patsubst src/%.jsonnet,var/lib/grafana/%.json,$(sources))
 
+# -- Plugins
+BAR_CHART_PLUGIN = https://github.com/gipong/grafana-groupedbarchart-panel/archive/refs/heads/master.zip
+
 default: help
 
 # ==============================================================================
@@ -25,14 +28,26 @@ var/lib/grafana/%.json: src/%.jsonnet
 	mkdir -p $(shell dirname $@)
 	bin/jsonnet -o /$@ $<
 
+var/lib/grafana/plugins:
+	mkdir -p ./var/lib/grafana/plugins
+
 tree: \
-	var/lib/grafana
+	var/lib/grafana \
+	var/lib/grafana/plugins
 .PHONY: tree
+
+# ==============================================================================
+# PLUGINS
+
+var/lib/grafana/plugins/grafana-groupedbarchart-panel-master:
+	curl -Lo /tmp/grafana_bar_chart_plugin.zip $(BAR_CHART_PLUGIN)
+	unzip /tmp/grafana_bar_chart_plugin.zip -d ./var/lib/grafana/plugins/
 
 # ==============================================================================
 # RULES
 bootstrap: \
 	tree \
+	plugins \
 	build \
 	compile
 bootstrap: ## bootstrap the application
@@ -42,6 +57,12 @@ build: ## build potsie development image
 	@$(COMPOSE) build app
 .PHONY: build
 
+clean: \
+	down
+clean: ## remove project files and containers (warning: it removes the database container)
+	rm -rf ./var
+.PHONY: clean
+
 compile: \
 	tree \
 	$(targets)
@@ -49,7 +70,7 @@ compile: ## compile jsonnet sources to json
 .PHONY: compile
 
 down: ## remove stack (warning: it removes the database container)
-	@$(COMPOSE) down
+	@$(COMPOSE) down || echo WARNING: unable to remove the stack. Try to stop linked containers or networks first.
 .PHONY: down
 
 format: ## format Jsonnet sources
@@ -63,6 +84,12 @@ lint: ## lint Jsonnet sources
 logs: ## display grafana logs (follow mode)
 	@$(COMPOSE) logs -f grafana
 .PHONY: logs
+
+plugins: \
+	tree \
+	var/lib/grafana/plugins/grafana-groupedbarchart-panel-master
+plugins: ## download plugins
+.PHONY: plugins
 
 restart: ## restart grafana
 	@$(COMPOSE) restart grafana

@@ -97,6 +97,15 @@ dashboard.new(
     refresh='time'
   )
 )
+.addTemplate(
+  template.custom(
+    name='EVENT_GROUP_INTERVAL',
+    current='30',
+    label='Event group interval',
+    query='1,10,20,30,60,120,180,300,600',
+    refresh='time'
+  )
+)
 .addPanel(
   row.new(title='Views metrics', collapse=false),
   gridPos={ x: 0, y: 0, w: 24, h: 1 }
@@ -448,4 +457,78 @@ dashboard.new(
     )
   ),
   gridPos={ x: 12, y: 8, w: 12, h: 9 }
+)
+.addPanel(
+  {
+    title: 'Event distribution during the video',
+    description: |||
+      We divide the video duration into equal intervals and for each interval display
+      its event distribution.
+      The interval size is controlled by the `Event group interval` variable
+    |||,
+    aliasColors: {},
+    avgLineShow: false,
+    barValuesShow: true,
+    cacheTimeout: null,
+    chartType: 'stacked bar chart',
+    colorSch: [],
+    datasource: 'lrs',
+    fontColor: '#fff',
+    fontSize: '80%',
+    format: 'short',
+    height: 400,
+    id: 9,
+    interval: null,
+    labelOrientation: 'horizontal',
+    labelSpace: 40,
+    legend: {
+      position: 'On graph',
+      show: true,
+    },
+    links: [],
+    maxDataPoints: 3,
+    nullPointMode: 'connected',
+    orientation: 'vertical',
+    strokeWidth: 1,
+    targets: [
+      {
+        alias: '',
+        bucketAggs: [
+          {
+            field: result_extensions_time_field,
+            id: '2',
+            settings: {
+              interval: '$EVENT_GROUP_INTERVAL',
+              min_doc_count: '1',
+            },
+            type: 'histogram',
+          },
+          {
+            field: verb_display_en_us_field,
+            id: '3',
+            settings: {
+              min_doc_count: '0',
+              order: 'desc',
+              orderBy: '_term',
+              size: '0',
+            },
+            type: 'terms',
+          },
+        ],
+        metrics: [
+          {
+            id: '1',
+            type: 'count',
+          },
+        ],
+        query: video_id_query,
+        refId: 'A',
+        timeField: 'timestamp',
+      },
+    ],
+    type: 'grafana-groupedbarchart-panel',
+    valueName: 'current',
+    width: 800,
+  },
+  gridPos={ x: 0, y: 17, w: 24, h: 16 }
 )
