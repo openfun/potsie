@@ -1,0 +1,9 @@
+apiVersion: 1
+
+datasources:
+  - name: edx_app
+    type: mysql
+    url: edx_mysql:3306
+    database: edxapp
+    user: edxapp_user
+    password: password
