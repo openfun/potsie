@@ -11,7 +11,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Added
 
 - Video course and statements Dashboards
-- `mysql` datasource provisioning from edx app.
+- Platform user in General Dashboard
+- `mysql` datasource provisioning from edx app
 - Video details dashboard new panel: video events distribution along the video
   timeline
 - Course video events distribution panel in details Dashboard
