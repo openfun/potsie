@@ -1,0 +1,25 @@
+{
+  "name": "fun-stacked-barchart",
+  "version": "1.0.0",
+  "description": "A stacked barchart panel",
+  "scripts": {
+    "build": "grafana-toolkit plugin:build",
+    "test": "grafana-toolkit plugin:test",
+    "dev": "grafana-toolkit plugin:dev",
+    "watch": "grafana-toolkit plugin:dev --watch",
+    "sign": "grafana-toolkit plugin:sign",
+    "start": "yarn watch"
+  },
+  "author": "FUN",
+  "license": "MIT",
+  "devDependencies": {
+    "@grafana/data": "8.0.3",
+    "@grafana/toolkit": "8.0.3",
+    "@grafana/ui": "8.0.3",
+    "@types/d3": "6",
+    "emotion": "10.0.27"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}

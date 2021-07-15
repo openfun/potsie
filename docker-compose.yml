@@ -33,6 +33,7 @@ services:
     user: "${DOCKER_USER:-1000}"
     volumes:
       - ./src/dashboards:/app/dashboards
+      - ./src/plugins:/app/plugins
       - ./var/lib/grafana/dashboards:/var/lib/grafana/dashboards
 
   jb:

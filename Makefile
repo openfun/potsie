@@ -88,7 +88,8 @@ logs: ## display grafana logs (follow mode)
 plugins: \
 	tree \
 	var/lib/grafana/plugins/grafana-groupedbarchart-panel-master
-plugins: ## download plugins
+plugins: ## download and install plugins
+	rsync -ar --delete src/plugins/* var/lib/grafana/plugins/
 .PHONY: plugins
 
 restart: ## restart grafana
@@ -106,6 +107,10 @@ run: ## start the development server
 	@$(WAIT_GRAFANA)
 	@$(COMPOSE) up -d app
 .PHONY: run
+
+sh: ## an alias for "docker-compose run --rm /bin/sh"
+	@$(COMPOSE_RUN) app /bin/sh
+.PHONY: sh
 
 status: ## an alias for "docker-compose ps"
 	@$(COMPOSE) ps

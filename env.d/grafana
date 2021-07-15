@@ -10,4 +10,4 @@ GF_SECURITY_ADMIN_PASSWORD=pass
 
 # Plugins
 GF_PATHS_PLUGINS=/var/lib/grafana/plugins/
-GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-groupedbarchart-panel
+GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS="grafana-groupedbarchart-panel,fun-stackedbarchart-panel"

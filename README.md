@@ -94,6 +94,60 @@ script, see:
 $ bin/jsonnet --help
 ```
 
+### Create a new Grafana Plugin
+
+Run `sh` in the docker container
+
+```bash
+$ make sh
+```
+
+From there, navigate to the plugins directory and launch the grafana/toolkit plugin creation script
+
+```bash
+$ cd plugins
+$ npx @grafana/toolkit plugin:create my-new-awesome-plugin
+```
+
+Grab a coffee or tea, this might take a while.
+
+Then, download the necessary dependencies and build the plugin
+
+```bash
+$ cd my-new-awesome-plugin
+$ yarn install
+$ yarn dev
+$ exit
+```
+
+You might need more coffee or tea.
+
+Finally, add your plugin to the GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS in `./env.d/grafana`
+(it's a comma separated list of plugin names), copy the plugin to `var/lib/grafana/plugins/` and restart grafana.
+
+```bash
+$ make plugins
+$ make stop
+$ make run
+```
+
+### Working on plugins
+
+Run `sh` in the docker container, navigate to the plugin and launch continuous build.
+
+```bash
+$ make sh
+$ cd plugins/my-new-awesome-plugin
+$ yarn watch
+```
+
+Create a new panel using the plugin. To view your changes on the plugin:
+copy the plugin to `var/lib/grafana/plugins/` and refresh the panel page in the browser.
+
+```bash
+$ make plugins
+```
+
 ## Contributing
 
 This project is intended to be community-driven, so please, do not hesitate to

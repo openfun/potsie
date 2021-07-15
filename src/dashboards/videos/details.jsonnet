@@ -34,7 +34,7 @@ local single_escape_string(x) = std.strReplace(std.strReplace(x, ':', '\\:'), '/
 dashboard.new(
   'Details',
   tags=['xAPI', 'video', 'teacher'],
-  editable=false
+  editable=true
 )
 .addTemplate(
   template.new(
@@ -531,4 +531,57 @@ dashboard.new(
     width: 800,
   },
   gridPos={ x: 0, y: 17, w: 24, h: 16 }
+)
+.addPanel(
+  {
+    title: 'Event distribution during the video',
+    description: |||
+      We divide the video duration into equal intervals and for each interval display
+      its event distribution.
+      The interval size is controlled by the `Event group interval` variable
+    |||,
+    datasource: 'lrs',
+    options: {
+      seriesCountSize: 'sm',
+      showSeriesCount: false,
+      text: 'Default value of text input option 3',
+    },
+    targets: [
+      {
+        bucketAggs: [
+          {
+            field: result_extensions_time_field,
+            id: '2',
+            settings: {
+              interval: '$EVENT_GROUP_INTERVAL',
+              min_doc_count: '1',
+            },
+            type: 'histogram',
+          },
+          {
+            field: verb_display_en_us_field,
+            id: '3',
+            settings: {
+              min_doc_count: '0',
+              order: 'desc',
+              orderBy: '_term',
+              size: '0',
+            },
+            type: 'terms',
+          },
+        ],
+        metrics: [
+          {
+            id: '1',
+            type: 'count',
+          },
+        ],
+        query: video_id_query,
+        refId: 'A',
+        timeField: 'timestamp',
+      },
+    ],
+    type: 'fun-stackedbarchart-panel',
+  },
+  gridPos={ x: 0, y: 33, w: 12, h: 8 }
 )

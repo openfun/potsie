@@ -17,13 +17,14 @@ COPY jsonnetfile.json jsonnetfile.lock.json /go/
 RUN jb install
 
 # Create image for dashboard generation
-FROM alpine:latest
+FROM node:14.17.3-alpine3.14
 
 # Update installed packages
 RUN apk -U upgrade
 
 RUN apk add --no-cache \
-     ca-certificates
+     ca-certificates \
+     git
 
 WORKDIR /app
 
