@@ -1,111 +1,25 @@
+// Video details dashboard
+
 local grafana = import 'grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
 local elasticsearch = grafana.elasticsearch;
 local graphPanel = grafana.graphPanel;
 local row = grafana.row;
 local statPanel = grafana.statPanel;
-local template = grafana.template;
+local video_common = import 'common.libsonnet';
+local common = import '../common.libsonnet';
 
-
-// Constants
-local lrs = 'lrs';
-local actor_account_name_field = 'actor.account.name.keyword';
-local context_extensions_completion_threshold_field = 'context.extensions.https://w3id.org/xapi/video/extensions/completion-threshold';
-local course_field = 'object.definition.extensions.http://adlnet.gov/expapi/activities/course.keyword';
-local result_extensions_time_field = 'result.extensions.https://w3id.org/xapi/video/extensions/time';
-local school_field = 'object.definition.extensions.https://w3id.org/xapi/acrossx/extensions/school.keyword';
-local session_field = 'object.definition.extensions.http://adlnet.gov/expapi/activities/module.keyword';
-local verb_display_en_us_field = 'verb.display.en-US.keyword';
-local video_id_field = 'object.id.keyword';
-local verb_id_completed_value = 'http://adlnet.gov/expapi/verbs/completed';
-local verb_id_initialized_value = 'http://adlnet.gov/expapi/verbs/initialized';
-local verb_id_played_value = 'https://w3id.org/xapi/video/verbs/played';
-
-
-// Queries
-local video_id_query = 'object.id.keyword:$VIDEO';
-
-// Utils
-local double_escape_string(x) = std.strReplace(std.strReplace(x, ':', '\\\\:'), '/', '\\\\/');
-local single_escape_string(x) = std.strReplace(std.strReplace(x, ':', '\\:'), '/', '\\/');
-
-
-// Dashboard
 dashboard.new(
   'Details',
-  tags=['xAPI', 'video', 'teacher'],
+  tags=[common.tags.xapi, common.tags.video, common.tags.teacher],
   editable=false
 )
-.addTemplate(
-  template.new(
-    name='SCHOOL',
-    current='all',
-    label='School',
-    datasource=lrs,
-    query='{"find": "terms", "field": "%(school)s"}' % {
-      school: school_field,
-    },
-    refresh='time'
-  )
-)
-.addTemplate(
-  template.new(
-    name='COURSE',
-    current='all',
-    label='Course',
-    datasource=lrs,
-    query='{"find": "terms", "field": "%(course)s", "query": "%(school)s:$SCHOOL"}' % {
-      course: course_field,
-      school: double_escape_string(school_field),
-    },
-    refresh='time'
-  )
-)
-.addTemplate(
-  template.new(
-    name='SESSION',
-    current='all',
-    label='Session',
-    datasource=lrs,
-    query='{"find": "terms", "field": "%(session)s", "query": "%(course)s:$COURSE"}' % {
-      session: session_field,
-      course: double_escape_string(course_field),
-    },
-    refresh='time'
-  )
-)
-.addTemplate(
-  template.new(
-    name='VIDEO',
-    current='all',
-    label='Video',
-    datasource=lrs,
-    query='{"find": "terms", "field": "%(video_id)s", "query": "%(course)s:$COURSE AND %(session)s:$SESSION"}' % {
-      video_id: video_id_field,
-      course: double_escape_string(course_field),
-      session: double_escape_string(session_field),
-    },
-    refresh='time'
-  )
-)
-.addTemplate(
-  template.custom(
-    name='VIEW_COUNT_THRESHOLD',
-    current='30',
-    label='View count threshold',
-    query='0,10,20,30,40,50,60',
-    refresh='time'
-  )
-)
-.addTemplate(
-  template.custom(
-    name='EVENT_GROUP_INTERVAL',
-    current='30',
-    label='Event group interval',
-    query='1,10,20,30,60,120,180,300,600',
-    refresh='time'
-  )
-)
+.addTemplate(video_common.templates.school)
+.addTemplate(video_common.templates.course)
+.addTemplate(video_common.templates.session)
+.addTemplate(video_common.templates.video)
+.addTemplate(video_common.templates.view_count_threshold)
+.addTemplate(video_common.templates.event_group_interval)
 .addPanel(
   row.new(title='Views metrics', collapse=false),
   gridPos={ x: 0, y: 0, w: 24, h: 1 }
@@ -121,24 +35,19 @@ dashboard.new(
       the video during the first seconds of the video. This time range is
       controlled by the `View count threshold` variable.
     |||,
-    datasource=lrs,
+    datasource=video_common.datasources.lrs,
     reducerFunction='sum',
     graphMode='none',
     unit='none'
   ).addTarget(
     elasticsearch.target(
-      datasource=lrs,
+      datasource=video_common.datasources.lrs,
       query='%(video_query)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO $VIEW_COUNT_THRESHOLD]' % {
-        video_query: video_id_query,
-        verb_played: verb_id_played_value,
-        time: single_escape_string(result_extensions_time_field),
+        video_query: video_common.queries.video_id,
+        verb_played: common.verb_ids.played,
+        time: common.utils.single_escape_string(video_common.fields.result_extensions_time),
       },
-      metrics=[
-        {
-          id: '1',
-          type: 'count',
-        },
-      ],
+      metrics=[common.metrics.count],
       bucketAggs=[
         {
           id: 'date',
@@ -163,29 +72,23 @@ dashboard.new(
       Unique views are views aggregated by users: each user can generate
       at most one view in this metric.
     |||,
-    datasource=lrs,
+    datasource=video_common.datasources.lrs,
     graphMode='none',
     reducerFunction='sum',
     unit='none',
     fields='/^Unique Count$/'
   ).addTarget(
     elasticsearch.target(
-      datasource=lrs,
+      datasource=video_common.datasources.lrs,
       query='%(video_query)s AND verb.id:"%(verb_played)s"' % {
-        video_query: video_id_query,
-        verb_played: verb_id_played_value,
+        video_query: video_common.queries.video_id,
+        verb_played: common.verb_ids.played,
       },
-      metrics=[
-        {
-          id: '1',
-          type: 'cardinality',
-          field: actor_account_name_field,
-        },
-      ],
+      metrics=[common.metrics.cardinality(common.fields.actor_account_name)],
       bucketAggs=[
         {
           id: 'name',
-          field: actor_account_name_field,
+          field: common.fields.actor_account_name,
           type: 'terms',
           settings: {
             order: 'desc',
@@ -207,22 +110,17 @@ dashboard.new(
       Total number of complete views of selected video. A view is considered as complete
       when the completion threshold of the video has been reached.
     |||,
-    datasource=lrs,
+    datasource=video_common.datasources.lrs,
     graphMode='none',
     reducerFunction='sum',
   ).addTarget(
     elasticsearch.target(
-      datasource=lrs,
+      datasource=video_common.datasources.lrs,
       query='%(video_query)s AND verb.id:"%(verb_completed)s"' % {
-        video_query: video_id_query,
-        verb_completed: verb_id_completed_value,
+        video_query: video_common.queries.video_id,
+        verb_completed: common.verb_ids.completed,
       },
-      metrics=[
-        {
-          id: '1',
-          type: 'count',
-        },
-      ],
+      metrics=[common.metrics.count],
       bucketAggs=[
         {
           id: '5',
@@ -245,29 +143,23 @@ dashboard.new(
     description=|||
       Total number of unique complete views of selected video.
     |||,
-    datasource=lrs,
+    datasource=video_common.datasources.lrs,
     graphMode='none',
     reducerFunction='sum',
     unit='none',
     fields='/^Unique Count$/'
   ).addTarget(
     elasticsearch.target(
-      datasource=lrs,
+      datasource=video_common.datasources.lrs,
       query='%(video_query)s AND verb.id:"%(verb_completed)s"' % {
-        video_query: video_id_query,
-        verb_completed: verb_id_completed_value,
+        video_query: video_common.queries.video_id,
+        verb_completed: common.verb_ids.completed,
       },
-      metrics=[
-        {
-          id: '1',
-          type: 'cardinality',
-          field: actor_account_name_field,
-        },
-      ],
+      metrics=[common.metrics.cardinality(common.fields.actor_account_name)],
       bucketAggs=[
         {
           id: '5',
-          field: actor_account_name_field,
+          field: common.fields.actor_account_name,
           type: 'terms',
           settings: {
             min_doc_count: '0',
@@ -288,25 +180,19 @@ dashboard.new(
     description=|||
       Ratio of the video that needs to be seen to consider the video as completed.
     |||,
-    datasource=lrs,
+    datasource=video_common.datasources.lrs,
     graphMode='none',
     reducerFunction='max',
     unit='none',
     fields='/^Max context\\.extensions.https://w3id.org/xapi/video/extensions/completion\\-threshold$/'
   ).addTarget(
     elasticsearch.target(
-      datasource=lrs,
+      datasource=video_common.datasources.lrs,
       query='%(video_query)s AND verb.id:"%(verb_initialized)s"' % {
-        video_query: video_id_query,
-        verb_initialized: verb_id_initialized_value,
+        video_query: video_common.queries.video_id,
+        verb_initialized: common.verb_ids.initialized,
       },
-      metrics=[
-        {
-          id: '1',
-          type: 'max',
-          field: context_extensions_completion_threshold_field,
-        },
-      ],
+      metrics=[common.metrics.max(video_common.fields.context_extensions_completion_threshold)],
       bucketAggs=[
         {
           id: '2',
@@ -328,21 +214,16 @@ dashboard.new(
       A view is counted when the user has clicked the play button in the interface
       in the first ${VIEW_COUNT_THRESHOLD} seconds of the video.
     |||,
-    datasource=lrs,
+    datasource=video_common.datasources.lrs,
   ).addTarget(
     elasticsearch.target(
-      datasource=lrs,
+      datasource=video_common.datasources.lrs,
       query='%(video_query)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO $VIEW_COUNT_THRESHOLD]' % {
-        video_query: video_id_query,
-        verb_played: verb_id_played_value,
-        time: single_escape_string(result_extensions_time_field),
+        video_query: video_common.queries.video_id,
+        verb_played: common.verb_ids.played,
+        time: common.utils.single_escape_string(video_common.fields.result_extensions_time),
       },
-      metrics=[
-        {
-          id: '1',
-          type: 'count',
-        },
-      ],
+      metrics=[common.metrics.count],
       bucketAggs=[
         {
           id: 'date',
@@ -367,19 +248,14 @@ dashboard.new(
 .addPanel(
   graphPanel.new(
     title='Verbs',
-    datasource=lrs,
+    datasource=video_common.datasources.lrs,
     bars=true,
     lines=false,
   ).addTarget(
     elasticsearch.target(
-      datasource=lrs,
-      query=video_id_query,
-      metrics=[
-        {
-          id: '1',
-          type: 'count',
-        },
-      ],
+      datasource=video_common.datasources.lrs,
+      query=video_common.queries.video_id,
+      metrics=[common.metrics.count],
       bucketAggs=[
         {
           id: 'verb',
@@ -414,26 +290,21 @@ dashboard.new(
     description=|||
       Distribution of events according to their type.
     |||,
-    datasource=lrs,
+    datasource=video_common.datasources.lrs,
     bars='true',
     lines='false',
     x_axis_mode='series',
   ).addTarget(
     elasticsearch.target(
-      datasource=lrs,
+      datasource=video_common.datasources.lrs,
       query='%(video_query)s' % {
-        video_query: video_id_query,
+        video_query: video_common.queries.video_id,
       },
-      metrics=[
-        {
-          id: '1',
-          type: 'count',
-        },
-      ],
+      metrics=[common.metrics.count],
       bucketAggs=[
         {
           id: '2',
-          field: verb_display_en_us_field,
+          field: video_common.fields.verb_display_en_us,
           type: 'terms',
           settings: {
             order: 'asc',
@@ -472,7 +343,7 @@ dashboard.new(
     cacheTimeout: null,
     chartType: 'stacked bar chart',
     colorSch: [],
-    datasource: 'lrs',
+    datasource: video_common.datasources.lrs,
     fontColor: '#fff',
     fontSize: '80%',
     format: 'short',
@@ -495,7 +366,7 @@ dashboard.new(
         alias: '',
         bucketAggs: [
           {
-            field: result_extensions_time_field,
+            field: video_common.fields.result_extensions_time,
             id: '2',
             settings: {
               interval: '$EVENT_GROUP_INTERVAL',
@@ -504,7 +375,7 @@ dashboard.new(
             type: 'histogram',
           },
           {
-            field: verb_display_en_us_field,
+            field: video_common.fields.verb_display_en_us,
             id: '3',
             settings: {
               min_doc_count: '0',
@@ -515,13 +386,8 @@ dashboard.new(
             type: 'terms',
           },
         ],
-        metrics: [
-          {
-            id: '1',
-            type: 'count',
-          },
-        ],
-        query: video_id_query,
+        metrics: [common.metrics.count],
+        query: video_common.queries.video_id,
         refId: 'A',
         timeField: 'timestamp',
       },
