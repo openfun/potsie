@@ -5,8 +5,8 @@ datasources:
     type: elasticsearch
     editable: false
     access: proxy
-    database: "statements-marsha-*"
+    database: "statements*"
     url: http://elasticsearch:9200
     jsonData:
       esVersion: 70
-      timeField: "timestamp"
+      timeField: "@timestamp"

@@ -23,6 +23,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Changed
 
 - Upgrade `Grafana` to 8.0.3
+- Move the elasticsearch data source to a datastream
 
 ## [0.1.0] - 2021-06-22
 
