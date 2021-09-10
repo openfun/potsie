@@ -15,16 +15,10 @@ sources := $(shell find src/ -type f -name '*.jsonnet')
 libraries := $(shell find src/ -type f -name '*.libsonnet')
 targets := $(patsubst src/%.jsonnet,var/lib/grafana/%.json,$(sources))
 
-# -- Plugins
-BAR_CHART_PLUGIN = https://github.com/gipong/grafana-groupedbarchart-panel/archive/refs/heads/master.zip
-
 default: help
 
 # ==============================================================================
 # FILES
-var/lib/grafana:
-	mkdir -p var/lib/grafana
-
 var/lib/grafana/%.json: src/%.jsonnet
 	mkdir -p $(shell dirname $@)
 	bin/jsonnet -o /$@ $<
@@ -33,21 +27,24 @@ var/lib/grafana/plugins:
 	mkdir -p ./var/lib/grafana/plugins
 
 tree: \
-	var/lib/grafana \
 	var/lib/grafana/plugins
 .PHONY: tree
 
 # ==============================================================================
 # PLUGINS
+var/lib/grafana/plugins/grafana-groupedbarchart-panel:
+	cp -R src/plugins/node_modules/groupedbarchart-panel/dist ./var/lib/grafana/plugins/grafana-groupedbarchart-panel
 
-var/lib/grafana/plugins/grafana-groupedbarchart-panel-master:
-	curl -Lo /tmp/grafana_bar_chart_plugin.zip $(BAR_CHART_PLUGIN)
-	unzip /tmp/grafana_bar_chart_plugin.zip -d ./var/lib/grafana/plugins/
+vendored-plugins: \
+	var/lib/grafana/plugins/grafana-groupedbarchart-panel
+.PHONY: vendored-plugins
 
 # ==============================================================================
 # RULES
 bootstrap: \
 	tree \
+	dependencies \
+	vendored-plugins \
 	plugins \
 	build \
 	compile
@@ -61,7 +58,7 @@ build: ## build potsie development image
 clean: \
 	down
 clean: ## remove project files and containers (warning: it removes the database container)
-	rm -rf ./var
+	rm -rf ./var src/plugins/node_modules src/plugins/packages/*/node_modules src/plugins/packages/*/dist
 .PHONY: clean
 
 compile: \
@@ -69,6 +66,10 @@ compile: \
 	$(targets)
 compile: ## compile jsonnet sources to json
 .PHONY: compile
+
+dependencies: ## install project dependencies (plugins)
+	@$(COMPOSE_RUN) node yarn install
+.PHONY: dependencies
 
 down: ## remove stack (warning: it removes the database container)
 	@$(COMPOSE) down || echo WARNING: unable to remove the stack. Try to stop linked containers or networks first.
@@ -86,10 +87,8 @@ logs: ## display grafana logs (follow mode)
 	@$(COMPOSE) logs -f grafana
 .PHONY: logs
 
-plugins: \
-	tree \
-	var/lib/grafana/plugins/grafana-groupedbarchart-panel-master
-plugins: ## download plugins
+plugins: ## download, build and install plugins
+	@$(COMPOSE_RUN) node yarn build
 .PHONY: plugins
 
 restart: ## restart grafana

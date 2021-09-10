@@ -1,0 +1,37 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
+  "type": "panel",
+  "name": "stacked-barchart",
+  "id": "potsie-stackedbarchart-panel",
+  "info": {
+    "description": "A stacked barchart panel",
+    "author": {
+      "name": "GIP FUN MOOC",
+      "url": "https://github.com/openfun/"
+    },
+    "keywords": [
+      "stacked-barchart"
+    ],
+    "logos": {
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
+    },
+    "links": [
+      {
+        "name": "Website",
+        "url": "https://github.com/openfun/potsie"
+      },
+      {
+        "name": "License",
+        "url": "https://github.com/openfun/potsie/blob/main/LICENSE.md"
+      }
+    ],
+    "screenshots": [],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=7.0.0",
+    "plugins": []
+  }
+}

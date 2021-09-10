@@ -1,0 +1,27 @@
+{
+  "name": "potsie-stackedbarchart-panel",
+  "version": "1.0.0",
+  "description": "A stacked barchart panel",
+  "scripts": {
+    "build": "grafana-toolkit plugin:build",
+    "test": "grafana-toolkit plugin:test --coverage",
+    "dev": "grafana-toolkit plugin:dev",
+    "watch": "grafana-toolkit plugin:dev --watch",
+    "sign": "grafana-toolkit plugin:sign",
+    "start": "yarn watch"
+  },
+  "author": "GIP FUN MOOC",
+  "license": "MIT",
+  "devDependencies": {
+    "@grafana/data": "latest",
+    "@grafana/toolkit": "latest",
+    "@grafana/ui": "latest",
+    "@testing-library/dom": "^8.5.0",
+    "@testing-library/react": "^12.1.0",
+    "@testing-library/user-event": "^13.2.1",
+    "@types/d3": "5.16.4"
+  },
+  "engines": {
+    "node": ">=14"
+  }
+}

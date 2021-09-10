@@ -24,4 +24,4 @@ GF_DEFAULT_APP_MODE="development"
 
 # Plugins
 GF_PATHS_PLUGINS=/var/lib/grafana/plugins/
-GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-groupedbarchart-panel
+GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=grafana-groupedbarchart-panel,potsie-stackedbarchart-panel

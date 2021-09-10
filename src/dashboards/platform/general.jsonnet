@@ -2,7 +2,6 @@ local grafana = import 'grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
 local sql = grafana.sql;
 local statPanel = grafana.statPanel;
-local template = grafana.template;
 
 local edx_app = 'edx_app';
 

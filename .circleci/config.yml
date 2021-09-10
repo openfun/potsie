@@ -1,4 +1,4 @@
-version: 2
+version: 2.1
 jobs:
   # Git jobs
   # Check that the git history is clean and complies with our expectations
@@ -100,6 +100,21 @@ jobs:
           name: Lint sources
           command: make lint
 
+  # Build and test plugins
+  plugins:
+    docker:
+      - image: circleci/node:14
+    working_directory: ~/fun/src/plugins
+    steps:
+      - checkout:
+          path: ~/fun
+      - run:
+          name: Install dependencies
+          command: yarn install --frozen-lockfile
+      - run:
+          name: Build plugins, lint sources and run tests
+          command: yarn build
+
   # Make a new github release
   release:
     docker:
@@ -200,6 +215,10 @@ workflows:
       - lint:
           requires:
             - build-docker
+          filters:
+            tags:
+              only: /.*/
+      - plugins:
           filters:
             tags:
               only: /.*/

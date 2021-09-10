@@ -10,6 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Stacked-barchart plugin subproject
 - Video course and statements Dashboards
 - Platform user in General Dashboard
 - `mysql` datasource provisioning from edx app

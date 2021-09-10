@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# Helper script for creating new plugins.
+# Accepts one argument specifying the name of the plugin to create.
+# The plugin will be created in the ./src/plugins/packages folder.
+
+declare DOCKER_USER
+DOCKER_USER="$(id -u):$(id -g)"
+
+if [[ $# -ne 1 ]]; then
+    echo "ERROR: Only one argument specifying the name of the plugin to create is required."
+    exit 2
+fi
+
+CMD="cd packages; npx grafana-toolkit plugin:create $@"
+DOCKER_USER=${DOCKER_USER} docker-compose run --rm node /bin/bash -c "$CMD"
+
+PACKAGES=$(dirname $0)/../src/plugins/packages
+cp $PACKAGES/stacked-barchart/tsconfig.json $PACKAGES/$@/tsconfig.json
+cp $PACKAGES/stacked-barchart/.prettierrc.js $PACKAGES/$@/.prettierrc.js
+cp $PACKAGES/stacked-barchart/jest.config.js $PACKAGES/$@/jest.config.js
