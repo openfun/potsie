@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+declare DOCKER_UID="$(id -u)"
+declare DOCKER_GID="$(id -g)"
+
+DOCKER_UID=${DOCKER_UID} \
+  DOCKER_GID=${DOCKER_GID} \
+  docker-compose \
+  "$@"

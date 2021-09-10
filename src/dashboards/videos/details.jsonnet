@@ -246,6 +246,55 @@ dashboard.new(
   gridPos={ x: 0, y: 7, w: 24, h: 1 }
 )
 .addPanel(
+  {
+    title: 'Event distribution during the video',
+    description: |||
+      We divide the video duration into equal intervals and for each interval display
+      its event distribution.
+      The interval size is controlled by the `Event group interval` variable.
+    |||,
+    datasource: 'lrs',
+    options: {
+      xLabel: 'Video timeline (seconds)',
+      yLabel: '# events by type',
+      isXContinuous: true,
+      numberOfBins: 20,
+    },
+    targets: [
+      {
+        bucketAggs: [
+          {
+            field: video_common.fields.result_extensions_time,
+            id: '2',
+            settings: {
+              interval: '$EVENT_GROUP_INTERVAL',
+              min_doc_count: '1',
+            },
+            type: 'histogram',
+          },
+          {
+            field: video_common.fields.verb_display_en_us,
+            id: '3',
+            settings: {
+              min_doc_count: '0',
+              order: 'desc',
+              orderBy: '_term',
+              size: '0',
+            },
+            type: 'terms',
+          },
+        ],
+        metrics: [common.metrics.count],
+        query: video_common.queries.video_id,
+        refId: 'A',
+        timeField: 'timestamp',
+      },
+    ],
+    type: 'potsie-stackedbarchart-panel',
+  },
+  gridPos={ x: 0, y: 8, w: 24, h: 9 }
+)
+.addPanel(
   graphPanel.new(
     title='Verbs',
     datasource=video_common.datasources.lrs,
@@ -282,7 +331,7 @@ dashboard.new(
       timeField='timestamp'
     )
   ),
-  gridPos={ x: 0, y: 8, w: 12, h: 9 }
+  gridPos={ x: 0, y: 17, w: 12, h: 9 }
 )
 .addPanel(
   graphPanel.new(
@@ -327,7 +376,7 @@ dashboard.new(
       timeField='timestamp'
     )
   ),
-  gridPos={ x: 12, y: 8, w: 12, h: 9 }
+  gridPos={ x: 12, y: 17, w: 12, h: 9 }
 )
 .addPanel(
   {
@@ -396,5 +445,5 @@ dashboard.new(
     valueName: 'current',
     width: 800,
   },
-  gridPos={ x: 0, y: 17, w: 24, h: 16 }
+  gridPos={ x: 0, y: 26, w: 24, h: 16 }
 )

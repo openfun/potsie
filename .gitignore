@@ -1,2 +1,7 @@
 # Ignore compiled objects
 var/
+
+# Ignore node packages
+node_modules/
+dist/
+coverage/

@@ -94,6 +94,52 @@ script, see:
 $ bin/jsonnet --help
 ```
 
+### Create a new Grafana Plugin
+
+To create a new Grafana plugin, we use the following script:
+
+```bash
+$ ./bin/create-plugin my-new-awesome-plugin
+```
+
+The script will ask you a couple of questions and then create your plugin
+in the `./src/plugins/packages` directory using `@grafana/toolkit`.
+
+Then, download the necessary dependencies and build all plugins by running
+the following commands: 
+
+```bash
+$ make dependencies
+$ make plugins
+```
+
+Grab a coffee or tea; this might take a while :coffee:
+
+Finally, add your plugin to the `GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS` in `./env.d/grafana`
+(it's a  comma-separated list of plugin names) and restart Grafana:
+
+```bash
+$ make stop
+$ make run
+```
+
+### Working on plugins
+
+To launch continuous build of your plugin, run:
+
+```bash
+$ ./bin/run-plugin potsie-my-new-awesome-plugin watch
+```
+
+Note: the `run-plugin` script wraps the usual `npm run` commands and executes them
+on the node development docker image.
+You can replace the `watch` argument with any other script defined in your
+plugins package.json file.
+
+Finally, to view your changes on the plugin, create a new panel using the plugin
+in grafana and refresh the panel page in the browser.
+
+
 ## Contributing
 
 This project is intended to be community-driven, so please, do not hesitate to

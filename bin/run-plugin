@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# Helper script for managing plugins.
+# Accepts two arguments specifying the name of the plugin (found in the package.json)
+# and the script to execute.
+# The plugin with the provided name should be found at ./src/plugins/packages.
+# The scripts are defined in ./src/plugins/packages/THE_PLUGIN/package.json.
+# Common scripts are: build, test, dev, watch
+
+declare DOCKER_USER
+DOCKER_USER="$(id -u):$(id -g)"
+
+if [[ $# -ne 2 ]]; then
+    echo "ERROR: Two arguments are required: PLUGIN_NAME and SCRIPT."
+    exit 2
+fi
+
+DOCKER_USER=${DOCKER_USER} docker-compose run --rm node yarn workspace "${1}" run "${2}"

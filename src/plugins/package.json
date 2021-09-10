@@ -1,0 +1,23 @@
+{
+  "name": "potsie-plugins",
+  "version": "0.1.0",
+  "license": "MIT",
+  "author": "GIP FUN MOOC",
+  "engines": {
+    "node": ">=14"
+  },
+  "private": true,
+  "scripts": {
+    "build": "lerna run build --parallel",
+    "test": "lerna run test --parallel",
+    "dev": "lerna run dev --parallel"
+  },
+  "devDependencies": {
+    "@grafana/toolkit": "^8.1.3",
+    "groupedbarchart-panel": "https://github.com/gipong/grafana-groupedbarchart-panel.git",
+    "lerna": "^4.0.0"
+  },
+  "workspaces": [
+    "packages/*"
+  ]
+}
