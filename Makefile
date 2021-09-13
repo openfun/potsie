@@ -19,32 +19,21 @@ default: help
 
 # ==============================================================================
 # FILES
+var/lib/grafana:
+	mkdir -p var/lib/grafana
+
 var/lib/grafana/%.json: src/%.jsonnet
 	mkdir -p $(shell dirname $@)
 	bin/jsonnet -o /$@ $<
 
-var/lib/grafana/plugins:
-	mkdir -p ./var/lib/grafana/plugins
-
 tree: \
-	var/lib/grafana/plugins
+	var/lib/grafana
 .PHONY: tree
 
-# ==============================================================================
-# PLUGINS
-var/lib/grafana/plugins/grafana-groupedbarchart-panel:
-	cp -R src/plugins/node_modules/groupedbarchart-panel/dist ./var/lib/grafana/plugins/grafana-groupedbarchart-panel
-
-vendored-plugins: \
-	var/lib/grafana/plugins/grafana-groupedbarchart-panel
-.PHONY: vendored-plugins
-
-# ==============================================================================
 # RULES
 bootstrap: \
 	tree \
 	dependencies \
-	vendored-plugins \
 	plugins \
 	build \
 	compile

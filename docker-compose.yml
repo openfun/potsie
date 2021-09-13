@@ -14,7 +14,6 @@ services:
     volumes:
       - ./etc/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
       - ./etc/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
-      - ./var/lib/grafana/plugins:/var/lib/grafana/plugins/vendor
       - ./src/plugins:/var/lib/grafana/plugins/potsie
       - ./var/lib/grafana/dashboards:/var/lib/grafana/dashboards
     env_file:
