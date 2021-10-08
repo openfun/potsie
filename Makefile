@@ -6,13 +6,17 @@ DOCKER_USER          = $(DOCKER_UID):$(DOCKER_GID)
 COMPOSE              = DOCKER_USER=$(DOCKER_USER) docker-compose
 COMPOSE_RUN          = $(COMPOSE) run --rm
 
+# -- Node
+COMPOSE_RUN_NODE     = $(COMPOSE_RUN) node
+YARN                 = $(COMPOSE_RUN_NODE) yarn
+
 # -- Utils
 WAIT_DB              = $(COMPOSE_RUN) dockerize -wait tcp://postgresql:5432 -timeout 60s
 WAIT_GRAFANA         = $(COMPOSE_RUN) dockerize -wait http://grafana:3000 -timeout 60s
 
 # -- Targets
-sources := $(shell find src/ -type f -name '*.jsonnet')
-libraries := $(shell find src/ -type f -name '*.libsonnet')
+sources := $(shell find src -type f -name '*.jsonnet')
+libraries := $(shell find src -type f -name '*.libsonnet')
 targets := $(patsubst src/%.jsonnet,var/lib/grafana/%.json,$(sources))
 
 default: help
@@ -57,7 +61,7 @@ compile: ## compile jsonnet sources to json
 .PHONY: compile
 
 dependencies: ## install project dependencies (plugins)
-	@$(COMPOSE_RUN) node yarn install
+	@$(YARN) install
 .PHONY: dependencies
 
 down: ## remove stack (warning: it removes the database container)
@@ -77,7 +81,7 @@ logs: ## display grafana logs (follow mode)
 .PHONY: logs
 
 plugins: ## download, build and install plugins
-	@$(COMPOSE_RUN) node yarn build
+	@$(YARN) build
 .PHONY: plugins
 
 restart: ## restart grafana
