@@ -18,8 +18,12 @@ GF_AUTH_GENERIC_OAUTH_AUTH_URL=http://localhost:8080/auth/realms/fun-mooc/protoc
 GF_AUTH_GENERIC_OAUTH_TOKEN_URL=http://keycloak:8080/auth/realms/fun-mooc/protocol/openid-connect/token
 GF_AUTH_GENERIC_OAUTH_API_URL=http://keycloak:8080/auth/realms/fun-mooc/protocol/openid-connect/userinfo
 GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH="contains(roles[*], 'admin') && 'Admin' || contains(roles[*], 'editor') && 'Editor' || 'Viewer'"
-GF_AUTH_GENERIC_OAUTH_SCOPES=openid
-GF_LOG_FILTERS="auth:debug"
+GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_STRICT=true
+GF_AUTH_GENERIC_OAUTH_TLS_SKIP_VERIFY_INSECURE=true
+GF_AUTH_GENERIC_OAUTH_SCOPES="openid"
+GF_LOG_FILTERS="oauth.generic_oauth:debug"
+# ⚠️ ⚠️   Activate debug level globally
+# GF_LOG_LEVEL="debug"
 GF_DEFAULT_APP_MODE="development"
 
 # Plugins
