@@ -28,8 +28,6 @@ services:
     build:
       context: .
     image: potsie:development
-    env_file:
-      - env.d/app
     user: "${DOCKER_USER:-1000}"
     volumes:
       - ./src/dashboards:/app/dashboards
