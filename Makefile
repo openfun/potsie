@@ -97,7 +97,6 @@ run: ## start the development server
 	@$(COMPOSE) up -d grafana
 	@echo "Wait for grafana to be up..."
 	@$(WAIT_GRAFANA)
-	@$(COMPOSE) up -d app
 .PHONY: run
 
 status: ## an alias for "docker-compose ps"
