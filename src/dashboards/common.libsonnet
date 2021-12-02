@@ -6,6 +6,7 @@
     course: 'object.definition.extensions.http://adlnet.gov/expapi/activities/course.keyword',
     school: 'object.definition.extensions.https://w3id.org/xapi/acrossx/extensions/school.keyword',
     session: 'object.definition.extensions.http://adlnet.gov/expapi/activities/module.keyword',
+    course_key: 'context.contextActivities.parent.id.keyword',
   },
   metrics: {
     count: { id: '1', type: 'count' },

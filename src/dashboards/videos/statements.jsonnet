@@ -17,6 +17,7 @@ dashboard.new(
 .addTemplate(video_common.templates.school)
 .addTemplate(video_common.templates.course)
 .addTemplate(video_common.templates.session)
+.addTemplate(video_common.templates.course_key)
 .addTemplate(video_common.templates.statements_interval)
 .addPanel(
   statPanel.new(

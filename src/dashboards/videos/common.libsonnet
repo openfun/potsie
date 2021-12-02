@@ -21,6 +21,7 @@ local common = import '../common.libsonnet';
       school: common.utils.single_escape_string(common.fields.school),
       session: common.utils.single_escape_string(common.fields.session),
     },
+    course_key: 'context.contextActivities.parent.id.keyword',
     video_id: 'object.id.keyword:$VIDEO',
   },
   templates: {
@@ -33,6 +34,14 @@ local common = import '../common.libsonnet';
         course: common.fields.course,
         school: common.utils.double_escape_string(common.fields.school),
       },
+      refresh='time'
+    ),
+    course_key: template.new(
+      name='COURSE KEY',
+      current='all',
+      label='Courses Key',
+      datasource=$.datasources.lrs,
+      query='{"find": "terms", "field": "%(course_key)s"}' % { course_key: common.fields.course_key },
       refresh='time'
     ),
     event_group_interval: template.custom(
