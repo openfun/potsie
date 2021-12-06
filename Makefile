@@ -115,7 +115,7 @@ update: ## update jsonnet bundles
 # This rule requires to install the inotify-tools dependency (Linux Only)
 # https://github.com/inotify-tools/inotify-tools/wiki
 watch: ## automatically compiles sources when changed
-	bin/watch src "$(MAKE) compile"
+	bin/watch src "$(MAKE) -B compile"
 .PHONY: watch
 
 # ==============================================================================
