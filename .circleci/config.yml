@@ -79,7 +79,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - var/
+            - var/lib/grafana/dashboards
 
   # Lint Jsonnet sources
   lint:
@@ -120,7 +120,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - var/
+            - var/lib/grafana/plugins
 
   # Make a new github release
   release:
@@ -235,6 +235,7 @@ workflows:
           requires:
             - lint
             - compile
+            - plugins
           filters:
             branches:
               only: main
