@@ -17,7 +17,9 @@ WAIT_GRAFANA         = $(COMPOSE_RUN) dockerize -wait http://grafana:3000 -timeo
 # -- Targets
 sources := $(shell find src -type f -name '*.jsonnet')
 libraries := $(shell find src -type f -name '*.libsonnet')
+plugins := $(shell find src/plugins/packages -maxdepth 1 -mindepth 1 -type d)
 targets := $(patsubst src/%.jsonnet,var/lib/grafana/%.json,$(sources))
+plugins-dist := $(patsubst src/plugins/packages/%,var/lib/grafana/plugins/%,$(plugins))
 
 default: help
 
@@ -29,6 +31,10 @@ var/lib/grafana:
 var/lib/grafana/%.json: src/%.jsonnet
 	mkdir -p $(shell dirname $@)
 	bin/jsonnet -o /$@ $<
+
+var/lib/grafana/plugins/%: src/plugins/packages/%
+	mkdir -p $@
+	cp -R $</dist/* $@
 
 tree: \
 	var/lib/grafana
@@ -83,6 +89,12 @@ logs: ## display grafana logs (follow mode)
 plugins: ## download, build and install plugins
 	@$(YARN) build
 .PHONY: plugins
+
+plugins-dist: \
+	tree \
+  $(plugins-dist)
+plugins-dist: ## copy compiled plugins in the distribution tree
+.PHONY: plugins-dist
 
 restart: ## restart grafana
 	@$(COMPOSE) restart grafana
