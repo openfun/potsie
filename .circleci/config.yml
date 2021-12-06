@@ -102,18 +102,25 @@ jobs:
 
   # Build and test plugins
   plugins:
-    docker:
-      - image: circleci/node:14
-    working_directory: ~/fun/src/plugins
+    machine:
+      image: ubuntu-2004:202104-01
+      docker_layer_caching: true
+    working_directory: ~/fun
     steps:
-      - checkout:
-          path: ~/fun
+      - checkout
       - run:
-          name: Install dependencies
-          command: yarn install --frozen-lockfile
+          name: Install plugins dependencies
+          command: make dependencies
       - run:
-          name: Build plugins, lint sources and run tests
-          command: yarn build
+          name: Build plugins
+          command: make plugins
+      - run:
+          name: Copy plugins distribution
+          command: make plugins-dist
+      - persist_to_workspace:
+          root: .
+          paths:
+            - var/
 
   # Make a new github release
   release:
