@@ -1,35 +1,31 @@
-// Video commons
+// Teachers commons
 
 local grafana = import 'grafonnet/grafana.libsonnet';
 local template = grafana.template;
 local common = import '../common.libsonnet';
 
 {
-  datasources: {
-    lrs: 'lrs',
-  },
   fields: {
     context_extensions_completion_threshold: 'context.extensions.https://w3id.org/xapi/video/extensions/completion-threshold',
     result_extensions_length: 'result.extensions.https://w3id.org/xapi/video/extensions/length',
     result_extensions_time: 'result.extensions.https://w3id.org/xapi/video/extensions/time',
     verb_display_en_us: 'verb.display.en-US.keyword',
-    video_id: 'object.id.keyword',
   },
   queries: {
-    school_course_session: '%(school)s:$SCHOOL AND %(course)s:$COURSE AND %(session)s:$SESSION' % {
+    school_course_session: '%(school)s:${SCHOOL} AND %(course)s:${COURSE} AND %(session)s:${SESSION}' % {
       course: common.utils.single_escape_string(common.fields.course),
       school: common.utils.single_escape_string(common.fields.school),
       session: common.utils.single_escape_string(common.fields.session),
     },
-    video_id: 'object.id.keyword:$VIDEO',
+    video_id: 'object.id.keyword:${VIDEO}',
   },
   templates: {
     course: template.new(
       name='COURSE',
       current='all',
       label='Course',
-      datasource=$.datasources.lrs,
-      query='{"find": "terms", "field": "%(course)s", "query": "%(school)s:$SCHOOL"}' % {
+      datasource=common.datasources.lrs,
+      query='{"find": "terms", "field": "%(course)s", "query": "%(school)s:${SCHOOL}"}' % {
         course: common.fields.course,
         school: common.utils.double_escape_string(common.fields.school),
       },
@@ -46,7 +42,7 @@ local common = import '../common.libsonnet';
       name='SCHOOL',
       current='all',
       label='School',
-      datasource=$.datasources.lrs,
+      datasource=common.datasources.lrs,
       query='{"find": "terms", "field": "%(school)s"}' % { school: common.fields.school },
       refresh='time'
     ),
@@ -54,8 +50,8 @@ local common = import '../common.libsonnet';
       name='SESSION',
       current='all',
       label='Session',
-      datasource=$.datasources.lrs,
-      query='{"find": "terms", "field": "%(session)s", "query": "%(course)s:$COURSE"}' % {
+      datasource=common.datasources.lrs,
+      query='{"find": "terms", "field": "%(session)s", "query": "%(course)s:${COURSE}"}' % {
         session: common.fields.session,
         course: common.utils.double_escape_string(common.fields.course),
       },
@@ -72,9 +68,9 @@ local common = import '../common.libsonnet';
       name='VIDEO',
       current='all',
       label='Video',
-      datasource=$.datasources.lrs,
-      query='{"find": "terms", "field": "%(video_id)s", "query": "%(course)s:$COURSE AND %(session)s:$SESSION"}' % {
-        video_id: $.fields.video_id,
+      datasource=common.datasources.lrs,
+      query='{"find": "terms", "field": "%(video_id)s", "query": "%(course)s:${COURSE} AND %(session)s:${SESSION}"}' % {
+        video_id: common.fields.video_id,
         course: common.utils.double_escape_string(common.fields.course),
         session: common.utils.double_escape_string(common.fields.session),
       },

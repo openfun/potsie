@@ -8,6 +8,7 @@ local edx_app = 'edx_app';
 dashboard.new(
   'General',
   editable=false,
+  time_from='now-90d',
 )
 .addPanel(
   statPanel.new(
