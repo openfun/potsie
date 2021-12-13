@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Teachers dashboards for video activity
+
 ### Changed
 
 - Upgrade `Grafana` to 8.3.3

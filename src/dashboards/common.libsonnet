@@ -1,11 +1,16 @@
 // General commons
 
 {
+  datasources: {
+    lrs: 'lrs',
+    edx_app: 'edx_app',
+  },
   fields: {
     actor_account_name: 'actor.account.name.keyword',
     course: 'object.definition.extensions.http://adlnet.gov/expapi/activities/course.keyword',
     school: 'object.definition.extensions.https://w3id.org/xapi/acrossx/extensions/school.keyword',
     session: 'object.definition.extensions.http://adlnet.gov/expapi/activities/module.keyword',
+    video_id: 'object.id.keyword',
   },
   metrics: {
     count: { id: '1', type: 'count' },
@@ -23,7 +28,7 @@
   objects: {
     date_histogram(interval='auto', min_doc_count='1'):: {
       id: 'date',
-      field: 'timestamp',
+      field: '@timestamp',
       type: 'date_histogram',
       settings: {
         interval: interval,

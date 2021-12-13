@@ -24,11 +24,11 @@ dashboard.new(
     description=|||
       Total count of statements in the selected time range.
     |||,
-    datasource=video_common.datasources.lrs,
+    datasource=common.datasources.lrs,
     reducerFunction='sum',
   ).addTarget(
     elasticsearch.target(
-      datasource=video_common.datasources.lrs,
+      datasource=common.datasources.lrs,
       query=video_common.queries.school_course_session,
       metrics=[common.metrics.count],
       bucketAggs=[common.objects.date_histogram('$STATEMENTS_INTERVAL')],
@@ -43,17 +43,17 @@ dashboard.new(
     description=|||
       Total number of videos which had at least one interaction in the selected time range.
     |||,
-    datasource=video_common.datasources.lrs,
+    datasource=common.datasources.lrs,
     reducerFunction='count',
   ).addTarget(
     elasticsearch.target(
-      datasource=video_common.datasources.lrs,
+      datasource=common.datasources.lrs,
       query=video_common.queries.school_course_session,
       metrics=[common.metrics.count],
       bucketAggs=[
         {
           id: 'video',
-          field: video_common.fields.video_id,
+          field: common.fields.video_id,
           type: 'terms',
           settings: {
             min_doc_count: '1',
@@ -73,12 +73,12 @@ dashboard.new(
       Number of statements by ${STATEMENTS_INTERVAL}.
       The interval is controlled by the `Statements interval` variable
     |||,
-    datasource=video_common.datasources.lrs,
+    datasource=common.datasources.lrs,
     bars=true,
     lines=false,
   ).addTarget(
     elasticsearch.target(
-      datasource=video_common.datasources.lrs,
+      datasource=common.datasources.lrs,
       query=video_common.queries.school_course_session,
       metrics=[common.metrics.count],
       bucketAggs=[common.objects.date_histogram('$STATEMENTS_INTERVAL')],
@@ -94,7 +94,7 @@ dashboard.new(
       The distribution of the video durations in seconds.
       On the Y-axis is the video count and on the X-axis the duration.
     |||,
-    datasource: video_common.datasources.lrs,
+    datasource: common.datasources.lrs,
     fieldConfig: {
       defaults: {
         color: {
@@ -117,7 +117,7 @@ dashboard.new(
       {
         bucketAggs: [
           {
-            field: video_common.fields.video_id,
+            field: common.fields.video_id,
             id: '3',
             settings: {
               min_doc_count: '0',
@@ -153,7 +153,7 @@ dashboard.new(
       The distribution of the completion threshold by video.
       On the Y-axis is the number of videos and on the X-axis the threshold interval.
     |||,
-    datasource: video_common.datasources.lrs,
+    datasource: common.datasources.lrs,
     fieldConfig: {
       defaults: {
         color: {
