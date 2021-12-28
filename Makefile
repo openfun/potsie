@@ -13,6 +13,8 @@ YARN                 = $(COMPOSE_RUN_NODE) yarn
 # -- Utils
 WAIT_DB              = $(COMPOSE_RUN) dockerize -wait tcp://postgresql:5432 -timeout 60s
 WAIT_GRAFANA         = $(COMPOSE_RUN) dockerize -wait http://grafana:3000 -timeout 60s
+WAIT_ES              = $(COMPOSE_RUN) dockerize -wait http://elasticsearch:9200 -timeout 60s
+WAIT_MYSQL           = $(COMPOSE_RUN) dockerize -wait tcp://edx_mysql:3306 -timeout 60s
 
 # -- Targets
 sources := $(shell find src -type f -name '*.jsonnet')
@@ -46,7 +48,8 @@ bootstrap: \
 	dependencies \
 	plugins \
 	build \
-	compile
+	compile \
+	fixtures
 bootstrap: ## bootstrap the application
 .PHONY: bootstrap
 
@@ -73,6 +76,18 @@ dependencies: ## install project dependencies (plugins)
 down: ## remove stack (warning: it removes the database container)
 	@$(COMPOSE) down || echo WARNING: unable to remove the stack. Try to stop linked containers or networks first.
 .PHONY: down
+
+fixtures: \
+    run
+fixtures: ## Load test data (for development)
+	@echo "Wait for databases to be up..."
+	@$(WAIT_ES)
+	@$(WAIT_MYSQL)
+	zcat ./fixtures/elasticsearch/lrs.json.gz | \
+	  $(COMPOSE_RUN) patch_statements_date | \
+	  $(COMPOSE_RUN) ralph push -b es --es-index statements-fixtures  && \
+	  scripts/users-permissions.sh
+.PHONY: fixtures
 
 format: ## format Jsonnet sources and libraries
 	bin/jsonnetfmt -i $(sources) $(libraries)
