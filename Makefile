@@ -5,6 +5,7 @@ DOCKER_GID           = $(shell id -g)
 DOCKER_USER          = $(DOCKER_UID):$(DOCKER_GID)
 COMPOSE              = DOCKER_USER=$(DOCKER_USER) docker-compose
 COMPOSE_RUN          = $(COMPOSE) run --rm
+COMPOSE_RUN_ACL      = $(COMPOSE_RUN) acl
 
 # -- Node
 COMPOSE_RUN_NODE     = $(COMPOSE_RUN) node
@@ -53,9 +54,21 @@ bootstrap: \
 bootstrap: ## bootstrap the application
 .PHONY: bootstrap
 
-build: ## build potsie development image
-	@$(COMPOSE) build app
+build: \
+	build-app \
+	build-acl
+build: ## build development images
 .PHONY: build
+
+build-app: ## build potsie development image
+	@echo "Building grafana dashboards..."
+	@$(COMPOSE) build app
+.PHONY: build-app
+
+build-acl: ## build acl development image
+	@echo "Building acl companion app..."
+	@$(COMPOSE) build acl
+.PHONY: build-acl
 
 clean: \
 	down
@@ -93,12 +106,47 @@ format: ## format Jsonnet sources and libraries
 	bin/jsonnetfmt -i $(sources) $(libraries)
 .PHONY: format
 
-lint: ## lint Jsonnet sources and libraries
+lint-black: ## lint back-end python sources with black
+	@echo 'lint:black started…'
+	@$(COMPOSE_RUN_ACL) black acl tests
+.PHONY: lint-black
+
+lint-flake8: ## lint back-end python sources with flake8
+	@echo 'lint:flake8 started…'
+	@$(COMPOSE_RUN_ACL) flake8
+.PHONY: lint-flake8
+
+lint-isort: ## automatically re-arrange python imports in back-end code base
+	@echo 'lint:isort started…'
+	@$(COMPOSE_RUN_ACL) isort --atomic .
+.PHONY: lint-isort
+
+lint-pylint: ## lint back-end python sources with pylint
+	@echo 'lint:pylint started…'
+	@$(COMPOSE_RUN_ACL) pylint acl tests
+.PHONY: lint-pylint
+
+lint-bandit: ## lint back-end python sources with bandit
+	@echo 'lint:bandit started…'
+	@$(COMPOSE_RUN_ACL) bandit -qr acl
+.PHONY: lint-bandit
+
+lint-jsonnet: ## lint Jsonnet sources and libraries
 	bin/jsonnet-lint $(sources) $(libraries)
+.PHONY: lint-jsonnet
+
+lint: \
+  lint-isort \
+  lint-black \
+  lint-flake8 \
+  lint-pylint \
+  lint-bandit \
+	lint-jsonnet
+lint: ## lint all sources
 .PHONY: lint
 
 logs: ## display grafana logs (follow mode)
-	@$(COMPOSE) logs -f grafana
+	@$(COMPOSE) logs -f caddy acl grafana
 .PHONY: logs
 
 plugins: ## download, build and install plugins
@@ -121,7 +169,7 @@ run: ## start the development server
 	@$(COMPOSE) up -d postgresql
 	@echo "Wait for database to be up..."
 	@$(WAIT_DB)
-	@$(COMPOSE) up -d grafana
+	@$(COMPOSE) up -d caddy
 	@echo "Wait for grafana to be up..."
 	@$(WAIT_GRAFANA)
 .PHONY: run
@@ -133,6 +181,12 @@ status: ## an alias for "docker-compose ps"
 stop: ## stop the development server
 	@$(COMPOSE) stop
 .PHONY: stop
+
+test: \
+	run
+test: ## run acl tests
+	bin/pytest
+.PHONY: test
 
 update: ## update jsonnet bundles
 	@$(COMPOSE_RUN) jb update

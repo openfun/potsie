@@ -53,8 +53,6 @@ jobs:
     working_directory: ~/fun
     steps:
       - checkout
-      - setup_remote_docker:
-          docker_layer_caching: true
       - run:
           name: Build development image
           command: make build
@@ -66,7 +64,6 @@ jobs:
   compile:
     machine:
       image: ubuntu-2004:202104-01
-      docker_layer_caching: true
     working_directory: ~/fun
     steps:
       - checkout
@@ -85,7 +82,6 @@ jobs:
   lint:
     machine:
       image: ubuntu-2004:202104-01
-      docker_layer_caching: true
     working_directory: ~/fun
     steps:
       - checkout
@@ -104,7 +100,6 @@ jobs:
   plugins:
     machine:
       image: ubuntu-2004:202104-01
-      docker_layer_caching: true
     working_directory: ~/fun
     steps:
       - checkout
@@ -153,7 +148,7 @@ jobs:
           name: Build release archive
           command: |
             mkdir releases
-            tar cvzf releases/postie-${RELEASE}.tgz -C ~/fun var/lib/grafana
+            tar cvzf releases/potsie-${RELEASE}.tgz -C ~/fun var/lib/grafana
       - run:
           name: Get release changes
           command: |
@@ -196,7 +191,7 @@ workflows:
             branches:
               ignore: main
             tags:
-              only: /(?!^v).*/
+              only: /.*/
       - lint-changelog:
           filters:
             branches:
