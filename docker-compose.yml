@@ -22,9 +22,6 @@ services:
       - edx_mysql
       - elasticsearch
       - postgresql
-    networks:
-      - default
-      - potsie
 
   app:
     build:
@@ -59,8 +56,8 @@ services:
       - ./jsonnetfile.json:/go/jsonnetfile.json
       - ./jsonnetfile.lock.json:/go/jsonnetfile.lock.json
     entrypoint: jb
-  
-  patch_statements_date: 
+
+  patch_statements_date:
     image: python:3.10
     user: "${DOCKER_USER:-1000}"
     volumes:
@@ -74,8 +71,6 @@ services:
     environment:
       - RALPH_ES_HOSTS=http://elasticsearch:9200
       - RALPH_ES_INDEX=statements
-    networks:
-      - default
 
   elasticsearch:
     image: elasticsearch:7.16.2
@@ -84,32 +79,16 @@ services:
       discovery.type: single-node
     ports:
       - "9200:9200"
-    networks:
-      - default
 
   edx_mysql:
-    image: mariadb:latest
-    environment:
-      MYSQL_DATABASE: edxapp
-      MYSQL_USER: edxapp_user
-      MYSQL_PASSWORD: password
-      MYSQL_ROOT_USER: edxapp_user
-      MYSQL_ROOT_PASSWORD: password
-    ports:
-      - 3306:3306
+    image: mariadb:10.3.32
+    env_file:
+      - env.d/mysql
     volumes:
       - ./fixtures/mysql/edxapp.sql:/docker-entrypoint-initdb.d/init.sql
-    networks:
-      - default
 
   curl:
     image: curlimages/curl:latest
-    
 
   dockerize:
     image: jwilder/dockerize
-
-networks:
-  potsie:
-    name: potsie
-    driver: bridge
