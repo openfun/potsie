@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade `Grafana` to 8.3.3
+
 ### Fixed
 
 - `edx_mysql` datasource password configuration should stand in the
