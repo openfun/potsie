@@ -1,0 +1,6 @@
+# MySQL/Mariadb container configuration
+MYSQL_DATABASE=edxapp
+MYSQL_USER=edxapp_user
+MYSQL_PASSWORD=funfunfun
+MYSQL_ROOT_USER=admin
+MYSQL_ROOT_PASSWORD=pass
