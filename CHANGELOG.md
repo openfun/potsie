@@ -24,6 +24,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Removed
 
+- Statements interval, view count threshold and event group interval variables
 - Video dashboards
 
 ## [0.2.0] - 2021-12-06
