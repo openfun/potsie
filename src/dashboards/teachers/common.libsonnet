@@ -19,6 +19,10 @@ local common = import '../common.libsonnet';
   },
   queries: {
     course_key: 'context.contextActivities.parent.id.keyword:${EDX_COURSE_KEY:doublequote}',
+    course_enrollments: 'SELECT DISTINCT COUNT(`user_id`) FROM `student_courseenrollment` WHERE (`is_active`=1 AND `course_id`="${EDX_COURSE_KEY}")',
+    course_title: 'SELECT `title` FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
+    course_start_date: 'SELECT DATE_FORMAT(start_date, "%d/%m/%Y") FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
+    course_end_date: 'SELECT DATE_FORMAT(end_date, "%d/%m/%Y") FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
     course_query: '%(course_key)s OR (%(school_course_session)s)' % {
       course_key: $.queries.course_key,
       school_course_session: $.queries.school_course_session,
@@ -73,6 +77,42 @@ local common = import '../common.libsonnet';
       datasource=common.datasources.edx_app,
       query=$.queries.edx_course_key,
       regex='/course-v1:.*\\+\\d+\\+(.*)/',
+      hide='variable',
+      refresh='time'
+    ),
+    title: template.new(
+      name='TITLE',
+      current='all',
+      label='Title',
+      datasource=common.datasources.edx_app,
+      query=$.queries.course_title,
+      hide='variable',
+      refresh='time'
+    ),
+    start_date: template.new(
+      name='START_DATE',
+      current='all',
+      label='Start Date',
+      datasource=common.datasources.edx_app,
+      query=$.queries.course_start_date,
+      hide='variable',
+      refresh='time'
+    ),
+    end_date: template.new(
+      name='END_DATE',
+      current='all',
+      label='End Date',
+      datasource=common.datasources.edx_app,
+      query=$.queries.course_end_date,
+      hide='variable',
+      refresh='time'
+    ),
+    enrollments: template.new(
+      name='ENROLLMENTS',
+      current='all',
+      label='Enrollment',
+      datasource=common.datasources.edx_app,
+      query=$.queries.course_enrollments,
       hide='variable',
       refresh='time'
     ),
