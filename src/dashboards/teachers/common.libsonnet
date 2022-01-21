@@ -5,6 +5,12 @@ local template = grafana.template;
 local common = import '../common.libsonnet';
 
 {
+  constants:
+    {
+      view_count_threshold: '30',
+      statements_interval: '1d',
+      event_group_interval: '1',
+    },
   fields: {
     context_extensions_completion_threshold: 'context.extensions.https://w3id.org/xapi/video/extensions/completion-threshold',
     result_extensions_length: 'result.extensions.https://w3id.org/xapi/video/extensions/length',
@@ -70,20 +76,6 @@ local common = import '../common.libsonnet';
       hide='variable',
       refresh='time'
     ),
-    event_group_interval: template.custom(
-      name='EVENT_GROUP_INTERVAL',
-      current='30',
-      label='Event group interval',
-      query='1,10,20,30,60,120,180,300,600',
-      refresh='time'
-    ),
-    statements_interval: template.custom(
-      name='STATEMENTS_INTERVAL',
-      current='7d',
-      label='Statements interval',
-      query='1d,7d,14d,21d,28d',
-      refresh='time'
-    ),
     video: template.new(
       name='VIDEO',
       current='all',
@@ -94,13 +86,6 @@ local common = import '../common.libsonnet';
         course_key: $.queries.course_key,
         school_course_session: std.strReplace($.queries.school_course_session, '\\', '\\\\'),
       },
-      refresh='time'
-    ),
-    view_count_threshold: template.custom(
-      name='VIEW_COUNT_THRESHOLD',
-      current='30',
-      label='View count threshold',
-      query='0,10,20,30,40,50,60',
       refresh='time'
     ),
   },

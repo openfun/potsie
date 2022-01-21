@@ -26,25 +26,26 @@ dashboard.new(
     title='Views',
     description=|||
       A view is counted when the user has clicked the play button in the interface
-      in the first ${VIEW_COUNT_THRESHOLD} seconds of the video.
+      in the first %(view_count_threshold)s seconds of the video.
 
       Note that we count additional `views` each time the user plays or resumes
       the video during the first seconds of the video. This time range is
       controlled by the `View count threshold` variable.
-    |||,
+    ||| % { view_count_threshold: teachers_common.constants.view_count_threshold },
     datasource=common.datasources.lrs,
     graphMode='none',
     reducerFunction='sum'
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO ${VIEW_COUNT_THRESHOLD}]' % {
+      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
         course_query: teachers_common.queries.course_query,
         verb_played: common.verb_ids.played,
         time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
+        view_count_threshold: teachers_common.constants.view_count_threshold,
       },
       metrics=[common.metrics.count],
-      bucketAggs=[common.objects.date_histogram('${STATEMENTS_INTERVAL}')],
+      bucketAggs=[common.objects.date_histogram('%(statements_interval)s' % { statements_interval: teachers_common.constants.statements_interval })],
       timeField='@timestamp'
     )
   ),
@@ -108,22 +109,23 @@ dashboard.new(
 
 .addPanel(
   graphPanel.new(
-    title='Views by ${STATEMENTS_INTERVAL}',
+    title='Views by %(statements_interval)s' % { statements_interval: teachers_common.constants.statements_interval },
     description=|||
       A view is counted when the user has clicked the play button in the interface
-      in the first ${VIEW_COUNT_THRESHOLD} seconds of the video.
-    |||,
+      in the first %(view_count_threshold)s seconds of the video.
+    ||| % { view_count_threshold: teachers_common.constants.view_count_threshold },
     datasource=common.datasources.lrs,
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO ${VIEW_COUNT_THRESHOLD}]' % {
+      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
         course_query: teachers_common.queries.course_query,
         verb_played: common.verb_ids.played,
         time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
+        view_count_threshold: teachers_common.constants.view_count_threshold,
       },
       metrics=[common.metrics.count],
-      bucketAggs=[common.objects.date_histogram('${STATEMENTS_INTERVAL}')],
+      bucketAggs=[common.objects.date_histogram('%(statements_interval)s' % { statements_interval: teachers_common.constants.statements_interval })],
       timeField='@timestamp'
     )
   ),
@@ -296,10 +298,11 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO ${VIEW_COUNT_THRESHOLD}]' % {
+      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
         course_query: teachers_common.queries.course_query,
         verb_played: common.verb_ids.played,
         time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
+        view_count_threshold: teachers_common.constants.view_count_threshold,
       },
       metrics=[common.metrics.count],
       bucketAggs=[
