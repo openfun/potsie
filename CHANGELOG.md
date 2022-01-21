@@ -14,6 +14,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Changed
 
+- Upgrade `jsonnet` to 0.18.0
 - Upgrade `Grafana` to 8.3.3
 
 ### Fixed
