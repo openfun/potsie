@@ -76,6 +76,37 @@ dashboard.new(
   gridPos={ x: 6, y: 9, w: 6, h: 9 }
 )
 .addPanel(
+  statPanel.new(
+    title='Videos',
+    description=|||
+      Total number of videos which had at least one interaction in the selected time range.
+    |||,
+    datasource=common.datasources.lrs,
+    graphMode='none',
+    reducerFunction='count',
+  ).addTarget(
+    elasticsearch.target(
+      datasource=common.datasources.lrs,
+      query=teachers_common.queries.course_query,
+      metrics=[common.metrics.count],
+      bucketAggs=[
+        {
+          id: 'video',
+          field: common.fields.video_id,
+          type: 'terms',
+          settings: {
+            min_doc_count: '1',
+            size: '0',
+          },
+        },
+      ],
+      timeField='@timestamp'
+    )
+  ),
+  gridPos={ x: 12, y: 9, w: 6, h: 9 }
+)
+
+.addPanel(
   graphPanel.new(
     title='Views by ${STATEMENTS_INTERVAL}',
     description=|||
@@ -96,7 +127,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 12, y: 9, w: 12, h: 9 }
+  gridPos={ x: 0, y: 18, w: 24, h: 9 }
 )
 .addPanel(
   {
@@ -173,7 +204,7 @@ dashboard.new(
     ],
     type: 'histogram',
   },
-  gridPos={ x: 12, y: 18, w: 12, h: 9 }
+  gridPos={ x: 12, y: 27, w: 12, h: 9 }
 )
 .addPanel(
   {
@@ -253,7 +284,7 @@ dashboard.new(
     ],
     type: 'histogram',
   },
-  gridPos={ x: 0, y: 27, w: 12, h: 9 }
+  gridPos={ x: 0, y: 36, w: 12, h: 9 }
 )
 .addPanel(
   barGaugePanel.new(
@@ -306,5 +337,5 @@ dashboard.new(
       },
     },
   },
-  gridPos={ x: 0, y: 36, w: 12, h: 9 }
+  gridPos={ x: 0, y: 54, w: 12, h: 9 }
 )
