@@ -51,5 +51,6 @@
     completed: 'http://adlnet.gov/expapi/verbs/completed',
     initialized: 'http://adlnet.gov/expapi/verbs/initialized',
     played: 'https://w3id.org/xapi/video/verbs/played',
+    downloaded: 'http://id.tincanapi.com/verb/downloaded',
   },
 }
