@@ -17,6 +17,7 @@ dashboard.new(
   editable=false,
   time_from='now-90d',
 )
+.addLink(teachers_common.link.teacher)
 .addTemplate(teachers_common.templates.edx_course_key)
 .addTemplate(teachers_common.templates.school)
 .addTemplate(teachers_common.templates.course)
