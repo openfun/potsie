@@ -65,7 +65,7 @@ dashboard.new(
       timeField='timestamp'
     )
   ),
-  gridPos={ x: 0, y: 1, w: 4.8, h: 4.5 }
+  gridPos={ x: 0, y: 1, w: 4.8, h: 3 }
 )
 .addPanel(
   statPanel.new(
@@ -137,7 +137,7 @@ dashboard.new(
       timeField='timestamp'
     )
   ),
-  gridPos={ x: 0, y: 4, w: 4.8, h: 4.5 },
+  gridPos={ x: 0, y: 3, w: 4.8, h: 3 },
 )
 .addPanel(
   statPanel.new(
@@ -175,6 +175,41 @@ dashboard.new(
     )
   ),
   gridPos={ x: 4.8, y: 3, w: 4.8, h: 3 },
+)
+.addPanel(
+  statPanel.new(
+    title='Downloads',
+    description=|||
+      Number of video downloads.
+    |||,
+    datasource=common.datasources.lrs,
+    reducerFunction='sum',
+    graphMode='none',
+    unit='none'
+  ).addTarget(
+    elasticsearch.target(
+      datasource=common.datasources.lrs,
+      query='%(video_query)s AND verb.id:"%(verb_downloaded)s"' % {
+        video_query: teachers_common.queries.video_id,
+        verb_downloaded: common.verb_ids.downloaded,
+      },
+      metrics=[common.metrics.count],
+      bucketAggs=[
+        {
+          id: 'date',
+          field: '@timestamp',
+          type: 'date_histogram',
+          settings: {
+            interval: '1d',
+            min_doc_count: '0',
+            trimEdges: '0',
+          },
+        },
+      ],
+      timeField='timestamp'
+    )
+  ),
+  gridPos={ x: 0, y: 5, w: 4.8, h: 3 }
 )
 .addPanel(
   statPanel.new(

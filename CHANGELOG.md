@@ -10,6 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Download panel on Teachers Course Video Overview dashboard
 - Links between Teachers folder dashboards
 - Metadata panels for Teachers dashboard
 - Teachers dashboards for video activity
