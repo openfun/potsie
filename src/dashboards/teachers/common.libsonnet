@@ -2,6 +2,7 @@
 
 local grafana = import 'grafonnet/grafana.libsonnet';
 local template = grafana.template;
+local link = grafana.link;
 local common = import '../common.libsonnet';
 
 {
@@ -16,6 +17,15 @@ local common = import '../common.libsonnet';
     result_extensions_length: 'result.extensions.https://w3id.org/xapi/video/extensions/length',
     result_extensions_time: 'result.extensions.https://w3id.org/xapi/video/extensions/time',
     verb_display_en_us: 'verb.display.en-US.keyword',
+  },
+  link: {
+    teacher: link.dashboards(
+      includeVars=true,
+      keepTime=true,
+      tags=[common.tags.teacher],
+      title='Teacher dashboards',
+      type='dashboards'
+    ),
   },
   queries: {
     course_key: 'context.contextActivities.parent.id.keyword:${EDX_COURSE_KEY:doublequote}',

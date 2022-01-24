@@ -10,7 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
-- Metadata panel for Teachers dashboard
+- Links between Teachers folder dashboards
+- Metadata panels for Teachers dashboard
 - Teachers dashboards for video activity
 
 ### Changed
