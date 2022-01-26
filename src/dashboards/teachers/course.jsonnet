@@ -93,6 +93,30 @@ dashboard.new(
   gridPos={ x: 8, y: 9, w: 4, h: 6 }
 )
 .addPanel(
+  graphPanel.new(
+    title='Views by %(statements_interval)s' % { statements_interval: teachers_common.constants.statements_interval },
+    description=|||
+      A view is counted when the user has clicked the play button in the interface
+      in the first %(view_count_threshold)s seconds of the video.
+    ||| % { view_count_threshold: teachers_common.constants.view_count_threshold },
+    datasource=common.datasources.lrs,
+  ).addTarget(
+    elasticsearch.target(
+      datasource=common.datasources.lrs,
+      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+        course_query: teachers_common.queries.course_query,
+        verb_played: common.verb_ids.played,
+        time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
+        view_count_threshold: teachers_common.constants.view_count_threshold,
+      },
+      metrics=[common.metrics.count],
+      bucketAggs=[common.objects.date_histogram('%(statements_interval)s' % { statements_interval: teachers_common.constants.statements_interval })],
+      timeField='@timestamp'
+    )
+  ),
+  gridPos={ x: 12, y: 9, w: 12, h: 9 }
+)
+.addPanel(
   statPanel.new(
     title='Views',
     description=|||
@@ -120,7 +144,85 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 12, y: 9, w: 6, h: 9 }
+  gridPos={ x: 12, y: 18, w: 4, h: 4.5 }
+)
+.addPanel(
+  statPanel.new(
+    title='Unique views',
+    description=|||
+      Unique views are views aggregated by users: each user can generate
+      at most one view in this metric.
+    |||,
+    datasource=common.datasources.lrs,
+    graphMode='none',
+    reducerFunction='sum',
+    unit='none',
+    fields='/^Unique Count$/'
+  ).addTarget(
+    elasticsearch.target(
+      datasource=common.datasources.lrs,
+      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+        course_query: teachers_common.queries.course_query,
+        verb_played: common.verb_ids.played,
+        time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
+        view_count_threshold: teachers_common.constants.view_count_threshold,
+      },
+      metrics=[common.metrics.cardinality(common.fields.actor_account_name)],
+      bucketAggs=[
+        {
+          id: 'name',
+          field: common.fields.actor_account_name,
+          type: 'terms',
+          settings: {
+            order: 'desc',
+            orderBy: '_count',
+            min_doc_count: '0',
+            size: '0',
+          },
+        },
+      ],
+      timeField='@timestamp'
+    )
+  ),
+  gridPos={ x: 16, y: 18, w: 4, h: 4.5 }
+)
+.addPanel(
+  statPanel.new(
+    title='Average video views',
+    description=|||
+      Average number of views per video.
+    |||,
+    datasource=common.datasources.lrs,
+    graphMode='none',
+    reducerFunction='mean',
+    unit='none',
+  ).addTarget(
+    elasticsearch.target(
+      datasource=common.datasources.lrs,
+      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+        course_query: teachers_common.queries.course_query,
+        verb_played: common.verb_ids.played,
+        time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
+        view_count_threshold: teachers_common.constants.view_count_threshold,
+      },
+      metrics=[common.metrics.count],
+      bucketAggs=[
+        {
+          id: 'video',
+          field: common.fields.video_id,
+          type: 'terms',
+          settings: {
+            order: 'desc',
+            orderBy: '_count',
+            min_doc_count: '0',
+            size: '0',
+          },
+        },
+      ],
+      timeField='@timestamp'
+    )
+  ),
+  gridPos={ x: 20, y: 18, w: 4, h: 4.5 }
 )
 .addPanel(
   statPanel.new(
@@ -145,31 +247,82 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 18, y: 9, w: 6, h: 9 }
+  gridPos={ x: 12, y: 22.5, w: 4, h: 4.5 }
 )
 .addPanel(
-  graphPanel.new(
-    title='Views by %(statements_interval)s' % { statements_interval: teachers_common.constants.statements_interval },
+  statPanel.new(
+    title='Unique complete views',
     description=|||
-      A view is counted when the user has clicked the play button in the interface
-      in the first %(view_count_threshold)s seconds of the video.
-    ||| % { view_count_threshold: teachers_common.constants.view_count_threshold },
+      Total number of complete views of selected course session videos.
+      Note that a view is considered as complete when the completion threshold
+      of the video has been reached.
+    |||,
     datasource=common.datasources.lrs,
+    graphMode='none',
+    reducerFunction='sum',
+    unit='none',
+    fields='/^Unique Count$/'
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+      query='(%(course_query)s) AND verb.id:"%(verb_completed)s"' % {
         course_query: teachers_common.queries.course_query,
-        verb_played: common.verb_ids.played,
-        time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
-        view_count_threshold: teachers_common.constants.view_count_threshold,
+        verb_completed: common.verb_ids.completed,
       },
-      metrics=[common.metrics.count],
-      bucketAggs=[common.objects.date_histogram('%(statements_interval)s' % { statements_interval: teachers_common.constants.statements_interval })],
+      metrics=[common.metrics.cardinality(common.fields.actor_account_name)],
+      bucketAggs=[
+        {
+          id: '5',
+          field: common.fields.actor_account_name,
+          type: 'terms',
+          settings: {
+            min_doc_count: '0',
+            size: '0',
+            order: 'desc',
+            orderBy: '_count',
+          },
+        },
+      ],
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 0, y: 18, w: 12, h: 9 }
+  gridPos={ x: 16, y: 22.5, w: 4, h: 4.5 }
+)
+.addPanel(
+  statPanel.new(
+    title='Average complete video views',
+    description=|||
+      Average number of complete views per video.
+    |||,
+    datasource=common.datasources.lrs,
+    graphMode='none',
+    reducerFunction='mean',
+    unit='none',
+  ).addTarget(
+    elasticsearch.target(
+      datasource=common.datasources.lrs,
+      query='(%(course_query)s) AND verb.id:"%(verb_completed)s"' % {
+        course_query: teachers_common.queries.course_query,
+        verb_completed: common.verb_ids.completed,
+      },
+      metrics=[common.metrics.count],
+      bucketAggs=[
+        {
+          id: 'name',
+          field: common.fields.video_id,
+          type: 'terms',
+          settings: {
+            order: 'desc',
+            orderBy: '_count',
+            min_doc_count: '0',
+            size: '0',
+          },
+        },
+      ],
+      timeField='@timestamp'
+    )
+  ),
+  gridPos={ x: 20, y: 22.5, w: 4, h: 4.5 }
 )
 .addPanel(
   barGaugePanel.new(
@@ -223,7 +376,7 @@ dashboard.new(
       },
     },
   },
-  gridPos={ x: 12, y: 18, w: 12, h: 9 }
+  gridPos={ x: 0, y: 27, w: 12, h: 9 }
 )
 
 .addPanel(
@@ -301,7 +454,7 @@ dashboard.new(
     ],
     type: 'histogram',
   },
-  gridPos={ x: 12, y: 27, w: 12, h: 9 }
+  gridPos={ x: 12, y: 36, w: 12, h: 9 }
 )
 .addPanel(
   {
@@ -381,5 +534,5 @@ dashboard.new(
     ],
     type: 'histogram',
   },
-  gridPos={ x: 0, y: 36, w: 12, h: 9 }
+  gridPos={ x: 0, y: 44, w: 12, h: 9 }
 )

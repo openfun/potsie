@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Added
+
+- Average views and complete views numbers in Teachers Course Video Overview
+  Dashboard
+
 ## [0.3.0] - 2022-01-27
 
 ### Added
