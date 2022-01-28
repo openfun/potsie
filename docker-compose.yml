@@ -23,6 +23,34 @@ services:
       - elasticsearch
       - postgresql
 
+  caddy:
+    image: caddy:2.4.6
+    restart: unless-stopped
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./docker/files/etc/caddy/Caddyfile:/etc/caddy/Caddyfile
+    depends_on:
+      - grafana
+      - acl
+
+  acl:
+    build:
+      context: src/acl
+      target: development
+    image: potsie-acl-proxy:development
+    ports:
+      - 8000:8000
+    volumes:
+      - ./src/acl:/app
+      - ./docker/files/etc/acl/logging.json:/etc/acl/logging.json
+    env_file:
+      - env.d/acl
+    logging:
+      options:
+        max-size: "200k"
+    user: "${DOCKER_USER:-1000}"
+
   app:
     build:
       context: .

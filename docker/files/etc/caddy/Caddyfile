@@ -1,0 +1,12 @@
+localhost:8090
+
+reverse_proxy * grafana:3000
+
+reverse_proxy /d/* acl:8000 {
+
+  @accel header X-Accel-Redirect *
+	handle_response @accel {
+    rewrite {http.reverse_proxy.header.X-Accel-Redirect}
+    reverse_proxy grafana:3000
+	}
+}
