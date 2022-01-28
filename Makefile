@@ -131,17 +131,22 @@ lint-bandit: ## lint back-end python sources with bandit
 	@$(COMPOSE_RUN_ACL) bandit -qr acl
 .PHONY: lint-bandit
 
+lint-acl: \
+  lint-isort \
+  lint-black \
+  lint-flake8 \
+  lint-pylint \
+  lint-bandit
+lint-acl: ## lint ACL sources
+.PHONY: lint-acl
+
 lint-jsonnet: ## lint Jsonnet sources and libraries
 	bin/jsonnet-lint $(sources) $(libraries)
 .PHONY: lint-jsonnet
 
 lint: \
-  lint-isort \
-  lint-black \
-  lint-flake8 \
-  lint-pylint \
-  lint-bandit \
-	lint-jsonnet
+  lint-acl \
+  lint-jsonnet
 lint: ## lint all sources
 .PHONY: lint
 

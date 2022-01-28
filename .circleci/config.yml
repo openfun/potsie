@@ -1,10 +1,42 @@
+# Configuration file anchors
+generate-version-file: &generate-version-file
+  run:
+    name: Create a version.json
+    command: |
+      # Create a version.json à-la-mozilla
+      # https://github.com/mozilla-services/Dockerflow/blob/master/docs/version_object.md
+      printf '{"commit":"%s","version":"%s","source":"https://github.com/%s/%s","build":"%s"}\n' \
+        "$CIRCLE_SHA1" \
+        "$CIRCLE_TAG" \
+        "$CIRCLE_PROJECT_USERNAME" \
+        "$CIRCLE_PROJECT_REPONAME" \
+        "$CIRCLE_BUILD_URL" > src/acl/version.json
+
+docker-login: &docker-login
+  # Login to DockerHub
+  #
+  # Nota bene: you'll need to define the following secrets environment vars
+  # in CircleCI interface:
+  #
+  #   - DOCKER_HUB_USER
+  #   - DOCKER_HUB_PASSWORD
+  run:
+    name: Login to DockerHub
+    command: >
+      test -n "$DOCKER_HUB_USER" &&
+        echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin ||
+        echo "Docker Hub anonymous mode"
+
 version: 2.1
 jobs:
   # Git jobs
   # Check that the git history is clean and complies with our expectations
   lint-git:
     docker:
-      - image: circleci/python:3.9-buster
+      - image: cimg/python:3.9
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -15,7 +47,7 @@ jobs:
       - run:
           name: Install gitlint
           command: |
-            pip install --user gitlint
+            pip install --user gitlint requests
       - run:
           name: Lint commit messages added to main
           command: |
@@ -24,7 +56,10 @@ jobs:
   # Check that the CHANGELOG has been updated in the current branch
   check-changelog:
     docker:
-      - image: circleci/buildpack-deps:stretch-scm
+      - image: cimg/base:2021.04
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -36,7 +71,10 @@ jobs:
   # Check that the CHANGELOG max line length does not exceed 80 characters
   lint-changelog:
     docker:
-      - image: debian:stretch
+      - image: cimg/base:2021.04
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -46,30 +84,59 @@ jobs:
             # Get the longuest line width (ignoring release links)
             test $(cat CHANGELOG.md | grep -Ev "^\[.*\]: https://github.com/openfun" | wc -L) -le 80
 
+  # ---- Docker jobs ----
   # Build the Docker image used in development
-  build-docker:
+  build-docker-potsie:
     docker:
-      - image: circleci/buildpack-deps:stretch
+      - image: cimg/base:2021.04
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
+      # Activate docker-in-docker (with layers caching enabled)
+      - setup_remote_docker:
+          docker_layer_caching: true
       - run:
           name: Build development image
-          command: make build
+          command: make build-app
       - run:
           name: Check built image availability
           command: docker images "potsie:*"
 
+
+  # Build the Docker image ready for production
+  build-docker-acl:
+    docker:
+      - image: cimg/base:2021.04
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - *generate-version-file
+      # Activate docker-in-docker (with layers caching enabled)
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Build production image
+          command: docker build -t potsie-acl-proxy:${CIRCLE_SHA1} --target production src/acl
+      - run:
+          name: Check built image availability
+          command: docker images "potsie-acl-proxy:${CIRCLE_SHA1}*"
+
   # Compile Jsonnet sources
   compile:
     machine:
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2004:202111-02
     working_directory: ~/fun
     steps:
       - checkout
       - run:
           name: Build development image
-          command: make build
+          command: make build-app
       - run:
           name: Compile sources
           command: make compile
@@ -79,27 +146,58 @@ jobs:
             - var/lib/grafana/dashboards
 
   # Lint Jsonnet sources
-  lint:
+  lint-jsonnet:
     machine:
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2004:202111-02
     working_directory: ~/fun
     steps:
       - checkout
       - run:
           name: Build production image
-          command: make build
+          command: make build-app
       - run:
           name: Format sources
           command: |
             bin/jsonnetfmt --test $(find src/ -type f -name '*.jsonnet') $(find src/ -type f -name '*.libsonnet')
       - run:
           name: Lint sources
-          command: make lint
+          command: make lint-jsonnet
+
+  # Lint acl
+  lint-acl:
+    machine:
+      image: ubuntu-2004:202111-02
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - run:
+          name: Build acl development image
+          command: make build-acl
+      - run:
+          name: Lint sources
+          command: make lint-acl
+
+  # Test acl
+  test-acl:
+    machine:
+      image: ubuntu-2004:202111-02
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - run:
+          name: Build acl development image
+          command: make build-acl
+      - run:
+          name: Load test fixtures
+          command: make fixtures
+      - run:
+          name: Test sources
+          command: make test
 
   # Build and test plugins
   plugins:
     machine:
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2004:202111-02
     working_directory: ~/fun
     steps:
       - checkout
@@ -120,7 +218,10 @@ jobs:
   # Make a new github release
   release:
     docker:
-      - image: circleci/buildpack-deps:stretch-scm
+      - image: cimg/base:2021.04
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       # Add a deployment key to allow write access to the github repository
@@ -128,6 +229,9 @@ jobs:
           fingerprints:
             - "ca:0c:a4:e2:4a:43:ca:9f:ee:15:cf:99:94:4e:78:38"
       - checkout
+      # Activate docker-in-docker (with layers caching enabled)
+      - setup_remote_docker:
+          docker_layer_caching: true
       - attach_workspace:
           at: ~/fun
       - run:
@@ -149,6 +253,24 @@ jobs:
           command: |
             mkdir releases
             tar cvzf releases/potsie-${RELEASE}.tgz -C ~/fun var/lib/grafana
+      - *generate-version-file
+      - *docker-login
+      - run:
+          name: Build release acl proxy docker images
+          command: |
+            docker build -t potsie-acl-proxy:${RELEASE} --target production src/acl
+            docker tag potsie-acl-proxy:${RELEASE} fundocker/potsie-acl-proxy:${RELEASE/v/}
+            if [[ "${RELEASE}" != "latest" ]]; then
+              docker tag potsie-acl-proxy:${RELEASE} fundocker/potsie-acl-proxy:latest
+            fi
+            docker images "potsie-acl-proxy"
+      - run:
+          name: Publish acl proxy docker images
+          command: |
+            docker push fundocker/potsie-acl-proxy:${RELEASE/v/}
+            if [[ "${RELEASE}" != "latest" ]]; then
+              docker push fundocker/potsie-acl-proxy:latest
+            fi
       - run:
           name: Get release changes
           command: |
@@ -200,7 +322,11 @@ workflows:
               only: /.*/
 
       # Build tooling
-      - build-docker:
+      - build-docker-potsie:
+          filters:
+            tags:
+              only: /.*/
+      - build-docker-acl:
           filters:
             tags:
               only: /.*/
@@ -208,15 +334,27 @@ workflows:
       # Compile sources
       - compile:
           requires:
-            - build-docker
+            - build-docker-potsie
           filters:
             tags:
               only: /.*/
 
       # Quality checks
-      - lint:
+      - lint-jsonnet:
           requires:
-            - build-docker
+            - build-docker-potsie
+          filters:
+            tags:
+              only: /.*/
+      - lint-acl:
+          requires:
+            - build-docker-acl
+          filters:
+            tags:
+              only: /.*/
+      - test-acl:
+          requires:
+            - build-docker-acl
           filters:
             tags:
               only: /.*/
@@ -225,10 +363,12 @@ workflows:
             tags:
               only: /.*/
 
-      # Release
+      # Releases
       - release:
           requires:
-            - lint
+            - lint-jsonnet
+            - lint-acl
+            - test-acl
             - compile
             - plugins
           filters:
