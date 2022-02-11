@@ -28,6 +28,10 @@ local common = import '../common.libsonnet';
     ),
   },
   queries: {
+    complete_views: '%(video_query)s AND verb.id:"%(verb_completed)s"' % {
+      video_query: $.queries.video_id,
+      verb_completed: common.verb_ids.completed,
+    },
     course_key: 'context.contextActivities.parent.id.keyword:${EDX_COURSE_KEY:doublequote}',
     course_enrollments: 'SELECT DISTINCT COUNT(`user_id`) FROM `student_courseenrollment` WHERE (`is_active`=1 AND `course_id`="${EDX_COURSE_KEY}")',
     course_title: 'SELECT `title` FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
@@ -37,6 +41,7 @@ local common = import '../common.libsonnet';
       course_key: $.queries.course_key,
       school_course_session: $.queries.school_course_session,
     },
+
     edx_course_key: 'SELECT `key` FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
     school_course_session: '%(school)s:${SCHOOL:doublequote} AND %(course)s:${COURSE:doublequote} AND %(session)s:${SESSION:doublequote}' % {
       course: common.utils.single_escape_string(common.fields.course),
@@ -44,6 +49,12 @@ local common = import '../common.libsonnet';
       session: common.utils.single_escape_string(common.fields.session),
     },
     video_id: 'object.id.keyword:${VIDEO:doublequote}',
+    views: '%(video_query)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+      video_query: $.queries.video_id,
+      verb_played: common.verb_ids.played,
+      time: common.utils.single_escape_string($.fields.result_extensions_time),
+      view_count_threshold: $.constants.view_count_threshold,
+    },
   },
   templates: {
     edx_course_key: template.new(

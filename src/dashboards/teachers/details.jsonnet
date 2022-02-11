@@ -10,7 +10,7 @@ local teachers_common = import 'common.libsonnet';
 local common = import '../common.libsonnet';
 
 dashboard.new(
-  'Details',
+  'Course video details',
   tags=[common.tags.xapi, common.tags.video, common.tags.teacher],
   editable=false,
   time_from='now-90d',
@@ -43,26 +43,21 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_query)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
-        video_query: teachers_common.queries.video_id,
-        verb_played: common.verb_ids.played,
-        time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
-        view_count_threshold: teachers_common.constants.view_count_threshold,
-      },
+      query=teachers_common.queries.views,
       metrics=[common.metrics.count],
       bucketAggs=[
         {
           id: 'date',
           field: '@timestamp',
-          type: 'date_histogram',
           settings: {
             interval: '1d',
             min_doc_count: '0',
             trimEdges: '0',
           },
+          type: 'date_histogram',
         },
       ],
-      timeField='timestamp'
+      timeField='@timestamp'
     )
   ),
   gridPos={ x: 0, y: 1, w: 4.8, h: 3 }
@@ -82,25 +77,22 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_query)s AND verb.id:"%(verb_played)s"' % {
-        video_query: teachers_common.queries.video_id,
-        verb_played: common.verb_ids.played,
-      },
+      query=teachers_common.queries.views,
       metrics=[common.metrics.cardinality(common.fields.actor_account_name)],
       bucketAggs=[
         {
           id: 'name',
           field: common.fields.actor_account_name,
-          type: 'terms',
           settings: {
             order: 'desc',
             orderBy: '_count',
             min_doc_count: '0',
             size: '0',
           },
+          type: 'terms',
         },
       ],
-      timeField='timestamp'
+      timeField='@timestamp'
     )
   ),
   gridPos={ x: 4.8, y: 1, w: 4.8, h: 3 }
@@ -118,23 +110,21 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_query)s AND verb.id:"%(verb_completed)s"' % {
-        video_query: teachers_common.queries.video_id,
-        verb_completed: common.verb_ids.completed,
-      },
+      query=teachers_common.queries.complete_views,
       metrics=[common.metrics.count],
       bucketAggs=[
         {
           id: '5',
-          type: 'date_histogram',
+          field: '@timestamp',
           settings: {
             interval: 'auto',
             min_doc_count: '0',
             trimEdges: '0',
           },
+          type: 'date_histogram',
         },
       ],
-      timeField='timestamp'
+      timeField='@timestamp'
     )
   ),
   gridPos={ x: 0, y: 3, w: 4.8, h: 3 },
@@ -153,25 +143,22 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_query)s AND verb.id:"%(verb_completed)s"' % {
-        video_query: teachers_common.queries.video_id,
-        verb_completed: common.verb_ids.completed,
-      },
+      query=teachers_common.queries.complete_views,
       metrics=[common.metrics.cardinality(common.fields.actor_account_name)],
       bucketAggs=[
         {
           id: '5',
           field: common.fields.actor_account_name,
-          type: 'terms',
           settings: {
             min_doc_count: '0',
             size: '0',
             order: 'desc',
             orderBy: '_count',
           },
+          type: 'terms',
         },
       ],
-      timeField='timestamp'
+      timeField='@timestamp'
     )
   ),
   gridPos={ x: 4.8, y: 3, w: 4.8, h: 3 },
@@ -198,15 +185,15 @@ dashboard.new(
         {
           id: 'date',
           field: '@timestamp',
-          type: 'date_histogram',
           settings: {
             interval: '1d',
             min_doc_count: '0',
             trimEdges: '0',
           },
+          type: 'date_histogram',
         },
       ],
-      timeField='timestamp'
+      timeField='@timestamp'
     )
   ),
   gridPos={ x: 0, y: 5, w: 4.8, h: 3 }
@@ -239,7 +226,7 @@ dashboard.new(
           },
         },
       ],
-      timeField='timestamp'
+      timeField='@timestamp'
     )
   ),
   gridPos={ x: 4.8, y: 5, w: 4.8, h: 3 },
@@ -255,12 +242,7 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_query)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
-        video_query: teachers_common.queries.video_id,
-        verb_played: common.verb_ids.played,
-        time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
-        view_count_threshold: teachers_common.constants.view_count_threshold,
-      },
+      query=teachers_common.queries.views,
       metrics=[common.metrics.count],
       bucketAggs=[
         {
@@ -274,7 +256,7 @@ dashboard.new(
           },
         },
       ],
-      timeField='timestamp'
+      timeField='@timestamp'
     )
   ),
   gridPos={ x: 9.6, y: 1, w: 14.4, h: 9 }
@@ -325,7 +307,7 @@ dashboard.new(
         metrics: [common.metrics.count],
         query: teachers_common.queries.video_id,
         refId: 'A',
-        timeField: 'timestamp',
+        timeField: '@timestamp',
       },
     ],
     type: 'potsie-stackedbarchart-panel',
@@ -366,7 +348,7 @@ dashboard.new(
           },
         },
       ],
-      timeField='timestamp'
+      timeField='@timestamp'
     )
   ),
   gridPos={ x: 0, y: 17, w: 12, h: 9 }
@@ -411,7 +393,7 @@ dashboard.new(
           },
         },
       ],
-      timeField='timestamp'
+      timeField='@timestamp'
     )
   ),
   gridPos={ x: 12, y: 17, w: 12, h: 9 }

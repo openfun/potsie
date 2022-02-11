@@ -7,9 +7,10 @@ local barGaugePanel = grafana.barGaugePanel;
 local graphPanel = grafana.graphPanel;
 local statPanel = grafana.statPanel;
 local sql = grafana.sql;
+local teachers_common = import 'common.libsonnet';
 local text = grafana.text;
 local common = import '../common.libsonnet';
-local teachers_common = import 'common.libsonnet';
+
 
 dashboard.new(
   'Course videos overview',
@@ -27,12 +28,14 @@ dashboard.new(
 .addTemplate(teachers_common.templates.end_date)
 .addPanel(
   text.new(
-    title='Course',
+    title='Course information',
     content=|||
       # ${TITLE}
+      ## Started: ${START_DATE} 
+      ## Ended: ${END_DATE}
     |||
   ),
-  gridPos={ x: 0, y: 6, w: 12, h: 3 }
+  gridPos={ x: 0, y: 6, w: 4, h: 9 }
 )
 .addPanel(
   statPanel.new(
@@ -62,7 +65,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 0, y: 9, w: 4, h: 6 }
+  gridPos={ x: 4, y: 9, w: 4, h: 9 }
 )
 .addPanel(
   statPanel.new(
@@ -80,17 +83,7 @@ dashboard.new(
       format='table'
     )
   ),
-  gridPos={ x: 4, y: 9, w: 4, h: 6 }
-)
-.addPanel(
-  text.new(
-    title='Dates',
-    content=|||
-      ## Started: ${START_DATE} 
-      ## Ended: ${END_DATE}
-    |||
-  ),
-  gridPos={ x: 8, y: 9, w: 4, h: 6 }
+  gridPos={ x: 8, y: 9, w: 4, h: 9 }
 )
 .addPanel(
   graphPanel.new(
@@ -378,7 +371,6 @@ dashboard.new(
   },
   gridPos={ x: 0, y: 27, w: 12, h: 9 }
 )
-
 .addPanel(
   {
     title: 'Statements by user',
@@ -454,7 +446,7 @@ dashboard.new(
     ],
     type: 'histogram',
   },
-  gridPos={ x: 12, y: 36, w: 12, h: 9 }
+  gridPos={ x: 0, y: 36, w: 12, h: 9 }
 )
 .addPanel(
   {
@@ -535,4 +527,197 @@ dashboard.new(
     type: 'histogram',
   },
   gridPos={ x: 0, y: 44, w: 12, h: 9 }
+)
+.addPanel(
+  {
+    type: 'table',
+    title: 'Course run video views',
+    transformations: [
+      {
+        id: 'seriesToColumns',
+        options: {
+          byField: 'object.id.keyword',
+        },
+      },
+    ],
+    datasource: common.datasources.lrs,
+    fieldConfig: {
+      defaults: {
+        custom: {
+          align: 'auto',
+          displayMode: 'auto',
+          filterable: false,
+        },
+      },
+      overrides: [
+        {
+          matcher: {
+            id: 'byName',
+            options: 'object.id.keyword',
+          },
+          properties: [
+            {
+              id: 'displayName',
+              value: 'Video',
+            },
+          ],
+        },
+        {
+          matcher: {
+            id: 'byName',
+            options: 'Count 1',
+          },
+          properties: [
+            {
+              id: 'displayName',
+              value: 'Views',
+            },
+          ],
+        },
+        {
+          matcher: {
+            id: 'byName',
+            options: 'Unique Count 1',
+          },
+          properties: [
+            {
+              id: 'displayName',
+              value: 'Unique views',
+            },
+          ],
+        },
+        {
+          matcher: {
+            id: 'byName',
+            options: 'Count 2',
+          },
+          properties: [
+            {
+              id: 'displayName',
+              value: 'Complete views',
+            },
+          ],
+        },
+        {
+          matcher: {
+            id: 'byName',
+            options: 'Unique Count 2',
+          },
+          properties: [
+            {
+              id: 'displayName',
+              value: 'Complete unique views',
+            },
+          ],
+        },
+      ],
+    },
+    options: {
+      showHeader: true,
+    },
+    targets: [
+      {
+        bucketAggs: [
+          {
+            field: common.fields.video_id,
+            id: '2',
+            settings: {
+              min_doc_count: '0',
+              order: 'asc',
+              orderBy: '_count',
+              size: '0',
+            },
+            type: 'terms',
+          },
+        ],
+        datasource: common.datasources.lrs,
+        metrics: [
+          {
+            id: '1',
+            type: 'count',
+          },
+        ],
+        query: '(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+          course_query: teachers_common.queries.course_query,
+          verb_played: common.verb_ids.played,
+          time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
+          view_count_threshold: teachers_common.constants.view_count_threshold,
+        },
+        refId: 'Videos views query',
+        timeField: '@timestamp',
+      },
+      {
+        bucketAggs: [
+          {
+            id: 'name',
+            field: common.fields.video_id,
+            type: 'terms',
+            settings: {
+              min_doc_count: '0',
+              order: 'desc',
+              orderBy: '_count',
+              size: '0',
+            },
+          },
+        ],
+        datasource: common.datasources.lrs,
+        metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
+        query: '(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+          course_query: teachers_common.queries.course_query,
+          verb_played: common.verb_ids.played,
+          time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
+          view_count_threshold: teachers_common.constants.view_count_threshold,
+        },
+        refId: 'Videos unique views query',
+        timeField: '@timestamp',
+      },
+      {
+        bucketAggs: [
+          {
+            id: 'name',
+            field: common.fields.video_id,
+            type: 'terms',
+            settings: {
+              order: 'desc',
+              orderBy: '_count',
+              min_doc_count: '0',
+              size: '0',
+            },
+          },
+        ],
+        datasource: common.datasources.lrs,
+        metrics: [common.metrics.count],
+        query: '(%(course_query)s) AND verb.id:"%(verb_completed)s"' % {
+          course_query: teachers_common.queries.course_query,
+          verb_completed: common.verb_ids.completed,
+        },
+        refId: 'Videos complete views query',
+        timeField: '@timestamp',
+      },
+      {
+        bucketAggs: [
+          {
+            field: common.fields.video_id,
+            id: '2',
+            settings: {
+              min_doc_count: '0',
+              order: 'desc',
+              orderBy: '_count',
+              size: '0',
+            },
+            type: 'terms',
+          },
+        ],
+        datasource: common.datasources.lrs,
+        metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
+        query: '(%(course_query)s) AND verb.id:"%(verb_completed)s"' % {
+          course_query: teachers_common.queries.course_query,
+          verb_completed: common.verb_ids.completed,
+        },
+        refId: 'Videos complete unique views query',
+        timeField: '@timestamp',
+      },
+    ],
+  },
+  gridPos={ x: 12, y: 36, w: 12, h: 18 }
 )
