@@ -622,7 +622,7 @@ dashboard.new(
             field: common.fields.video_id,
             id: '2',
             settings: {
-              min_doc_count: '0',
+              min_doc_count: '1',
               order: 'asc',
               orderBy: '_count',
               size: '0',
@@ -653,7 +653,7 @@ dashboard.new(
             field: common.fields.video_id,
             type: 'terms',
             settings: {
-              min_doc_count: '0',
+              min_doc_count: '1',
               order: 'desc',
               orderBy: '_count',
               size: '0',
@@ -680,7 +680,7 @@ dashboard.new(
             settings: {
               order: 'desc',
               orderBy: '_count',
-              min_doc_count: '0',
+              min_doc_count: '1',
               size: '0',
             },
           },
@@ -700,7 +700,7 @@ dashboard.new(
             field: common.fields.video_id,
             id: '2',
             settings: {
-              min_doc_count: '0',
+              min_doc_count: '1',
               order: 'desc',
               orderBy: '_count',
               size: '0',
