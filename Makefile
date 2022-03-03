@@ -5,6 +5,7 @@ DOCKER_GID           = $(shell id -g)
 DOCKER_USER          = $(DOCKER_UID):$(DOCKER_GID)
 COMPOSE              = DOCKER_USER=$(DOCKER_USER) docker-compose
 COMPOSE_RUN          = $(COMPOSE) run --rm
+EDXAPP_DATASOURCE   ?= "edx_app"
 
 # -- Node
 COMPOSE_RUN_NODE     = $(COMPOSE_RUN) node
@@ -32,7 +33,7 @@ var/lib/grafana:
 
 var/lib/grafana/%.json: src/%.jsonnet
 	mkdir -p $(shell dirname $@)
-	bin/jsonnet -o /$@ $<
+	bin/jsonnet --ext-str EDXAPP_DATASOURCE=$(EDXAPP_DATASOURCE) -o /$@ $<
 
 var/lib/grafana/plugins/%: src/plugins/packages/%
 	mkdir -p $@
@@ -70,6 +71,10 @@ compile: \
 compile: ## compile jsonnet sources to json
 .PHONY: compile
 
+compile-demo: ## compile jsonnet sources to json (using sqlite as data source for edxapp)
+	EDXAPP_DATASOURCE="edx_app_demo" $(MAKE) -B compile
+.PHONY: compile-demo
+
 dependencies: ## install project dependencies (plugins)
 	@$(YARN) install
 .PHONY: dependencies
@@ -79,7 +84,7 @@ down: ## remove stack (warning: it removes the database container)
 .PHONY: down
 
 fixtures: \
-    run
+	run
 fixtures: ## Load test data (for development)
 	@echo "Wait for databases to be up..."
 	@$(WAIT_ES)
@@ -112,7 +117,7 @@ plugins: ## download, build and install plugins
 
 plugins-dist: \
 	tree \
-  $(plugins-dist)
+	$(plugins-dist)
 plugins-dist: ## copy compiled plugins in the distribution tree
 .PHONY: plugins-dist
 

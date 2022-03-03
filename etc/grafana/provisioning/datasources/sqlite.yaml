@@ -1,0 +1,9 @@
+apiVersion: 1
+
+datasources:
+  - name: edx_app_demo
+    type: frser-sqlite-datasource
+    access: proxy
+    isDefault: false
+    jsonData:
+      path: /app/edxapp.db

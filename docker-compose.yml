@@ -18,6 +18,7 @@ services:
       - ./etc/grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
       - ./src/plugins:/var/lib/grafana/plugins/potsie
       - ./var/lib/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./fixtures/sqlite/edxapp.db:/app/edxapp.db
     env_file:
       - env.d/grafana
     depends_on:

@@ -3,7 +3,7 @@
 {
   datasources: {
     lrs: 'lrs',
-    edx_app: 'edx_app',
+    edx_app: std.extVar('EDXAPP_DATASOURCE'),
     marsha: 'marsha',
   },
   fields: {

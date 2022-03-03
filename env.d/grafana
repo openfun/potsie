@@ -29,3 +29,4 @@ GF_DEFAULT_APP_MODE="development"
 # Plugins
 GF_PATHS_PLUGINS=/var/lib/grafana/plugins/
 GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS=potsie-stackedbarchart-panel
+GF_INSTALL_PLUGINS=https://github.com/fr-ser/grafana-sqlite-datasource/releases/download/v3.0.0/frser-sqlite-datasource-3.0.0.zip;frser-sqlite-datasource
