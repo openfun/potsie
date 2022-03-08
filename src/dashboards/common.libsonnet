@@ -11,6 +11,12 @@
     school: 'object.definition.extensions.https://w3id.org/xapi/acrossx/extensions/school.keyword',
     session: 'object.definition.extensions.http://adlnet.gov/expapi/activities/module.keyword',
     video_id: 'object.id.keyword',
+    subtitle_enabled: 'context.extensions.https://w3id.org/xapi/video/extensions/cc-subtitle-enabled',
+    full_screen: 'context.extensions.https://w3id.org/xapi/video/extensions/full-screen',
+    speed: 'context.extensions.https://w3id.org/xapi/video/extensions/speed.keyword',
+    subtitle_language: 'context.extensions.https://w3id.org/xapi/video/extensions/cc-subtitle-lang.keyword',
+    quality: 'context.extensions.https://w3id.org/xapi/video/extensions/quality',
+    volume: 'context.extensions.https://w3id.org/xapi/video/extensions/volume',
   },
   metrics: {
     count: { id: '1', type: 'count' },
@@ -44,8 +50,8 @@
     xapi: 'xAPI',
   },
   utils: {
-    double_escape_string(x):: std.strReplace(std.strReplace(x, ':', '\\\\:'), '/', '\\\\/'),
-    single_escape_string(x):: std.strReplace(std.strReplace(x, ':', '\\:'), '/', '\\/'),
+    double_escape_string(x):: std.strReplace(std.strReplace(std.strReplace(x, ':', '\\\\:'), '/', '\\\\/'), '-', '\\\\-'),
+    single_escape_string(x):: std.strReplace(std.strReplace(std.strReplace(x, ':', '\\:'), '/', '\\/'), '-', '\\-'),
   },
   verb_ids: {
     completed: 'http://adlnet.gov/expapi/verbs/completed',

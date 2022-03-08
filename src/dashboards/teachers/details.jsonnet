@@ -398,3 +398,417 @@ dashboard.new(
   ),
   gridPos={ x: 12, y: 17, w: 12, h: 9 }
 )
+.addPanel(
+  row.new(title='Interaction activities', collapse=false),
+  gridPos={ x: 0, y: 26, w: 24, h: 1 },
+)
+.addPanel(
+  statPanel.new(
+    title='Subtitle activation',
+    description=|||
+      The number of learners who have activated the subtitles.
+    |||,
+    datasource=common.datasources.lrs,
+    fields=common.fields.actor_account_name,
+    graphMode='none',
+    reducerFunction='count',
+    unit='none',
+  ).addTarget(
+    elasticsearch.target(
+      datasource=common.datasources.lrs,
+      query='%(video_query)s AND verb.id:"interacted" AND %(subtitle_enabled)s:true' % {
+        video_query: teachers_common.queries.video_id,
+        subtitle_enabled: common.utils.single_escape_string(common.fields.subtitle_enabled),
+      },
+      metrics=[common.metrics.count],
+      bucketAggs=[
+        {
+          id: '5',
+          field: common.fields.actor_account_name,
+          settings: {
+            min_doc_count: '1',
+            size: '0',
+            order: 'desc',
+            orderBy: '_count',
+          },
+          type: 'terms',
+        },
+      ],
+      timeField='@timestamp'
+    )
+  ),
+  gridPos={ x: 0, y: 26, w: 4, h: 6 }
+).addPanel(
+  {
+    type: 'barchart',
+    title: 'Selected subtitle language',
+    description: |||
+      The distribution of subtitle languages chosen by users when it is activated.
+    |||,
+    options: {
+      legend: {
+        displayMode: 'hidden',
+      },
+    },
+    fieldConfig: {
+      overrides: [
+        {
+          matcher: {
+            id: 'byName',
+            options: 'Unique Count',
+          },
+          properties: [
+            {
+              id: 'displayName',
+              value: 'Users',
+            },
+          ],
+        },
+      ],
+    },
+    targets: [
+      {
+        datasource: common.datasources.lrs,
+        query: '%(video_query)s AND verb.id:"interacted"' % {
+          video_query: teachers_common.queries.video_id,
+        },
+        metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
+        bucketAggs: [
+          {
+            id: '2',
+            type: 'terms',
+            settings: {
+              min_doc_count: '1',
+              size: '10',
+              order: 'desc',
+              orderBy: '_term',
+            },
+            field: common.fields.subtitle_language,
+          },
+        ],
+        timeField: '@timestamp',
+      },
+    ],
+    datasource: common.datasources.lrs,
+  },
+  gridPos={ x: 4, y: 26, w: 4, h: 6 }
+)
+.addPanel(
+  statPanel.new(
+    title='Full screen activation',
+    description=|||
+      The number of learners who have switched to full screen.
+    |||,
+    datasource=common.datasources.lrs,
+    fields=common.fields.actor_account_name,
+    graphMode='none',
+    reducerFunction='count',
+    unit='none',
+  ).addTarget(
+    elasticsearch.target(
+      datasource=common.datasources.lrs,
+      query='%(video_query)s AND verb.id:"interacted" AND %(full_screen)s:true' % {
+        video_query: teachers_common.queries.video_id,
+        full_screen: common.utils.single_escape_string(common.fields.full_screen),
+      },
+      metrics=[common.metrics.count],
+      bucketAggs=[
+        {
+          id: '5',
+          field: common.fields.actor_account_name,
+          settings: {
+            min_doc_count: '1',
+            size: '0',
+            order: 'desc',
+            orderBy: '_count',
+          },
+          type: 'terms',
+        },
+      ],
+      timeField='@timestamp'
+    )
+  ),
+  gridPos={ x: 8, y: 26, w: 4, h: 6 }
+).addPanel(
+  {
+    type: 'barchart',
+    title: 'Changed video speed',
+    description: |||
+      The distribution of changed video speed (compared to default).
+      By default the video speed is set to `1x`.
+    |||,
+    options: {
+      legend: {
+        displayMode: 'hidden',
+      },
+    },
+    fieldConfig: {
+      overrides: [
+        {
+          matcher: {
+            id: 'byName',
+            options: 'Unique Count',
+          },
+          properties: [
+            {
+              id: 'displayName',
+              value: 'Users',
+            },
+          ],
+        },
+      ],
+    },
+    targets: [
+      {
+        datasource: common.datasources.lrs,
+        query: '%(video_query)s AND verb.id:"interacted"' % {
+          video_query: teachers_common.queries.video_id,
+        },
+        metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
+        bucketAggs: [
+          {
+            id: '2',
+            type: 'terms',
+            settings: {
+              min_doc_count: '1',
+              size: '10',
+              order: 'desc',
+              orderBy: '_term',
+            },
+            field: common.fields.speed,
+          },
+        ],
+        timeField: '@timestamp',
+      },
+    ],
+    datasource: common.datasources.lrs,
+    transformations: [
+      {
+        id: 'filterByValue',
+        options: {
+          filters: [
+            {
+              fieldName: common.fields.speed,
+              config: {
+                id: 'equal',
+                options: {
+                  value: '1x',
+                },
+              },
+            },
+          ],
+          type: 'exclude',
+          match: 'all',
+        },
+      },
+    ],
+  },
+  gridPos={ x: 12, y: 26, w: 4, h: 6 }
+).addPanel(
+  {
+    type: 'barchart',
+    title: 'Changed video quality',
+    description: |||
+      The distribution of video quality chosen by the users.
+      By default, the video quality is set to `480`.
+    |||,
+    options: {
+      legend: {
+        displayMode: 'hidden',
+      },
+    },
+    fieldConfig: {
+      overrides: [
+        {
+          matcher: {
+            id: 'byName',
+            options: 'Unique Count',
+          },
+          properties: [
+            {
+              id: 'displayName',
+              value: 'Users',
+            },
+          ],
+        },
+      ],
+    },
+    targets: [
+      {
+        datasource: common.datasources.lrs,
+        query: '%(video_query)s AND verb.id:"interacted"' % {
+          video_query: teachers_common.queries.video_id,
+        },
+        metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
+        bucketAggs: [
+          {
+            id: '2',
+            type: 'terms',
+            settings: {
+              min_doc_count: '1',
+              size: '10',
+              order: 'desc',
+              orderBy: '_term',
+            },
+            field: common.fields.quality,
+          },
+        ],
+        timeField: '@timestamp',
+      },
+    ],
+    datasource: common.datasources.lrs,
+    transformations: [
+      {
+        id: 'convertFieldType',
+        options: {
+          conversions: [
+            {
+              targetField: common.fields.quality,
+              destinationType: 'string',
+            },
+          ],
+        },
+      },
+      {
+        id: 'filterByValue',
+        options: {
+          filters: [
+            {
+              fieldName: common.fields.quality,
+              config: {
+                id: 'equal',
+                options: {
+                  value: '480',
+                },
+              },
+            },
+          ],
+          type: 'exclude',
+          match: 'all',
+        },
+      },
+    ],
+  },
+  gridPos={ x: 16, y: 26, w: 4, h: 6 }
+).addPanel(
+  {
+    type: 'barchart',
+    title: 'Changed video volume',
+    description: |||
+      The number of users who chosed to reduce the video volume or completely mute the video.
+      By default, the volume is set to `1`.
+    |||,
+    options: {
+      legend: {
+        displayMode: 'hidden',
+      },
+    },
+    fieldConfig: {
+      overrides: [
+        {
+          matcher: {
+            id: 'byName',
+            options: common.fields.volume,
+          },
+          properties: [
+            {
+              id: 'mappings',
+              value: [
+                {
+                  type: 'range',
+                  options: {
+                    from: -0.01,
+                    to: 0.05,
+                    result: {
+                      text: 'Mute',
+                      index: 1,
+                    },
+                  },
+                },
+                {
+                  type: 'range',
+                  options: {
+                    from: 0.05000000000000000000001,
+                    to: 0.999,
+                    result: {
+                      text: 'Turned down',
+                      index: 0,
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+        },
+        {
+          matcher: {
+            id: 'byName',
+            options: 'Unique Count',
+          },
+          properties: [
+            {
+              id: 'displayName',
+              value: 'Users',
+            },
+          ],
+        },
+      ],
+    },
+    targets: [
+      {
+        datasource: common.datasources.lrs,
+        query: '%(video_query)s AND verb.id:"interacted"' % {
+          video_query: teachers_common.queries.video_id,
+        },
+        metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
+        bucketAggs: [
+          {
+            id: '2',
+            type: 'terms',
+            settings: {
+              min_doc_count: '1',
+              size: '10',
+              order: 'desc',
+              orderBy: '_term',
+            },
+            field: common.fields.volume,
+          },
+        ],
+        timeField: '@timestamp',
+      },
+    ],
+    datasource: common.datasources.lrs,
+    transformations: [
+      {
+        id: 'convertFieldType',
+        options: {
+          conversions: [
+            {
+              targetField: common.fields.volume,
+              destinationType: 'string',
+            },
+          ],
+        },
+      },
+      {
+        id: 'filterByValue',
+        options: {
+          filters: [
+            {
+              fieldName: common.fields.volume,
+              config: {
+                id: 'equal',
+                options: {
+                  value: '1',
+                },
+              },
+            },
+          ],
+          type: 'exclude',
+          match: 'all',
+        },
+      },
+    ],
+  },
+  gridPos={ x: 20, y: 26, w: 4, h: 6 }
+)

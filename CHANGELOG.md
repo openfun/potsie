@@ -10,6 +10,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Video interaction activities details on Teachers Course Video Details 
+  Dashboard
 - Videos views table on Teachers Course Video Overview Dashboard
 - Average views and complete views numbers in Teachers Course Video Overview
   Dashboard
