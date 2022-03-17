@@ -4,6 +4,7 @@
   datasources: {
     lrs: 'lrs',
     edx_app: 'edx_app',
+    marsha: 'marsha',
   },
   fields: {
     actor_account_name: 'actor.account.name.keyword',
