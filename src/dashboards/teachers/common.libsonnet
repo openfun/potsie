@@ -139,7 +139,6 @@ local common = import '../common.libsonnet';
     ),
     video: template.new(
       name='VIDEO',
-      current='all',
       label='Video',
       datasource=common.datasources.lrs,
       query='{"find": "terms", "field": "%(video_id)s", "query": "%(course_key)s OR (%(school_course_session)s)"}' % {
@@ -148,6 +147,37 @@ local common = import '../common.libsonnet';
         school_course_session: std.strReplace($.queries.school_course_session, '\\', '\\\\'),
       },
       refresh='time'
+    ),
+    course_video_ids: template.new(
+      name='COURSE_VIDEOS_IDS',
+      current='all',
+      hide='variable',
+      label='Course videos identifiers',
+      datasource=common.datasources.lrs,
+      query='{"find": "terms", "field": "%(video_id)s", "query": "%(course_key)s OR (%(school_course_session)s)"}' % {
+        video_id: common.fields.video_id,
+        course_key: $.queries.course_key,
+        school_course_session: std.strReplace($.queries.school_course_session, '\\', '\\\\'),
+      },
+      multi='true',
+      includeAll='true',
+      regex='/uuid\\:\\/\\/(?<value>.*)/',
+      refresh='time',
+    ),
+    course_video_ids_with_uuid: template.new(
+      name='COURSE_VIDEOS_IDS_WITH_UUID',
+      hide='variable',
+      current='all',
+      label='Video',
+      datasource=common.datasources.lrs,
+      query='{"find": "terms", "field": "%(video_id)s", "query": "%(course_key)s OR (%(school_course_session)s)"}' % {
+        video_id: common.fields.video_id,
+        course_key: $.queries.course_key,
+        school_course_session: std.strReplace($.queries.school_course_session, '\\', '\\\\'),
+      },
+      multi='true',
+      includeAll='true',
+      refresh='time',
     ),
   },
 }

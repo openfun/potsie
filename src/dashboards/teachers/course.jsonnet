@@ -26,6 +26,8 @@ dashboard.new(
 .addTemplate(teachers_common.templates.title)
 .addTemplate(teachers_common.templates.start_date)
 .addTemplate(teachers_common.templates.end_date)
+.addTemplate(teachers_common.templates.course_video_ids)
+.addTemplate(teachers_common.templates.course_video_ids_with_uuid)
 .addPanel(
   text.new(
     title='Course information',
@@ -540,7 +542,10 @@ dashboard.new(
         },
       },
     ],
-    datasource: common.datasources.lrs,
+    datasource: {
+      type: 'datasource',
+      uid: '-- Mixed --',
+    },
     fieldConfig: {
       defaults: {
         custom: {
@@ -558,7 +563,29 @@ dashboard.new(
           properties: [
             {
               id: 'displayName',
-              value: 'Video',
+              value: 'ID',
+            },
+            {
+              id: 'links',
+              value: [
+                {
+                  targetBlank: true,
+                  title: 'View detailled insights about this video',
+                  url: '/d/_3iCqpynk/details?orgId=1&var-EDX_COURSE_KEY=${EDX_COURSE_KEY}&var-VIDEO=${__value.text}',
+                },
+              ],
+            },
+          ],
+        },
+        {
+          matcher: {
+            id: 'byName',
+            options: 'title',
+          },
+          properties: [
+            {
+              id: 'displayName',
+              value: 'Title',
             },
           ],
         },
@@ -716,6 +743,50 @@ dashboard.new(
         },
         refId: 'Videos complete unique views query',
         timeField: '@timestamp',
+      },
+      {
+        bucketAggs: [
+          {
+            field: '@timestamp',
+            id: '2',
+            settings: {
+              interval: 'auto',
+            },
+            type: 'date_histogram',
+          },
+        ],
+        datasource: common.datasources.marsha,
+        format: 'table',
+        hide: false,
+        metricColumn: 'none',
+        metrics: [
+          {
+            id: '1',
+            type: 'count',
+          },
+        ],
+        query: '',
+        rawQuery: true,
+        rawSql: "SELECT 'uuid://' || id AS \"object.id.keyword\",title FROM video where id IN (${COURSE_VIDEOS_IDS:sqlstring})",
+        refId: 'B',
+        select: [
+          [
+            {
+              params: [
+                'value',
+              ],
+              type: 'column',
+            },
+          ],
+        ],
+        timeColumn: 'time',
+        timeField: '@timestamp',
+        where: [
+          {
+            name: '$__timeFilter',
+            type: 'macro',
+          },
+        ],
       },
     ],
   },
