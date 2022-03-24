@@ -38,6 +38,7 @@ ${curl} -H "${HEADER}" -d "{\"userId\": ${TEACHER_USER_ID}}" "http://grafana:300
 # Return id of the folders
 TEACHER_FOLDER_UID=$(${curl} "http://grafana:3000/api/folders" | jq -r '.[] | select(.title=="teachers") | .uid')
 PLATFORM_FOLDER_UID=$(${curl} "http://grafana:3000/api/folders" | jq -r '.[] | select(.title=="platform") | .uid')
+MARSHA_FOLDER_UID=$(${curl} "http://grafana:3000/api/folders" | jq -r '.[] | select(.title=="marsha") | .uid')
 
 # Get "Viewer" permission on "teacher" folder for the "Teacher" team only
 TEACHER_FOLDER_PERMISSION="{\"items\":[{\"teamId\":${TEACHER_TEAM_ID},\"permission\":1}]}"
@@ -45,3 +46,6 @@ ${curl} -H "${HEADER}" -d "${TEACHER_FOLDER_PERMISSION}" "http://grafana:3000/ap
 
 # Remove permission for "Student" and "Teacher" teams on the "platform" folder
 ${curl} -H "${HEADER}" -d "{}" "http://grafana:3000/api/folders/${PLATFORM_FOLDER_UID}/permissions"
+
+# Remove permission for "Student" and "Teacher" teams on the "marsha" folder
+${curl} -H "${HEADER}" -d "{}" "http://grafana:3000/api/folders/${MARSHA_FOLDER_UID}/permissions"
