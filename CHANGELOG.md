@@ -10,6 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Marsha Light Video Dashboard
 - Videos views table on Teachers Course Video Overview Dashboard
 - Average views and complete views numbers in Teachers Course Video Overview
   Dashboard
