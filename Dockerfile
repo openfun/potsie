@@ -7,10 +7,10 @@ RUN apk -U upgrade
 RUN apk add --no-cache git
 
 # Install core dependencies
-RUN go get github.com/google/go-jsonnet/cmd/jsonnet && \
-    go get github.com/google/go-jsonnet/cmd/jsonnet-lint && \
-    go get github.com/google/go-jsonnet/cmd/jsonnetfmt && \
-    go get github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb
+RUN go install github.com/google/go-jsonnet/cmd/jsonnet@latest && \
+    go install github.com/google/go-jsonnet/cmd/jsonnet-lint@latest && \
+    go install github.com/google/go-jsonnet/cmd/jsonnetfmt@latest && \
+    go install github.com/jsonnet-bundler/jsonnet-bundler/cmd/jb@latest
 
 # Install jsonnet bundles
 COPY jsonnetfile.json jsonnetfile.lock.json /go/
