@@ -5,6 +5,8 @@ services:
     image: postgres:13.3
     env_file:
       - env.d/postgresql
+    volumes:
+      - ./fixtures/postgresql/marsha.sql:/docker-entrypoint-initdb.d/init.sql
 
   grafana:
     image: grafana/grafana:8.3.3
