@@ -297,7 +297,7 @@ dashboard.new(
             id: '3',
             settings: {
               min_doc_count: '0',
-              order: 'desc',
+              order: 'asc',
               orderBy: '_term',
               size: '0',
             },
@@ -316,7 +316,7 @@ dashboard.new(
 )
 .addPanel(
   graphPanel.new(
-    title='Verbs',
+    title='Time distribution of video events',
     datasource=common.datasources.lrs,
     bars=true,
     lines=false,
@@ -331,8 +331,8 @@ dashboard.new(
           field: 'verb.display.en-US.keyword',
           type: 'terms',
           settings: {
-            order: 'desc',
-            orderBy: '_count',
+            order: 'asc',
+            orderBy: '_term',
             min_doc_count: '0',
             size: '0',
           },
