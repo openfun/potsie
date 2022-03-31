@@ -390,14 +390,6 @@ dashboard.new(
         displayName: 'User',
       },
     },
-    options: {
-      bucketOffset: 0,
-      legend: {
-        calcs: ['count', 'max', 'mean'],
-        displayMode: 'list',
-        placement: 'bottom',
-      },
-    },
     targets: [
       {
         bucketAggs: [
@@ -465,14 +457,6 @@ dashboard.new(
           mode: 'palette-classic',
         },
         displayName: 'User',
-      },
-    },
-    options: {
-      bucketOffset: 0,
-      legend: {
-        calcs: ['count', 'max', 'mean'],
-        displayMode: 'list',
-        placement: 'bottom',
       },
     },
     targets: [
