@@ -10,6 +10,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Improve dashboards layout on Teachers Video Dashboard
 - Videos views table on Teachers Course Video Overview Dashboard linked 
 with corresponding Teachers Course Video Details Dashboard
 - Video interaction activities details on Teachers Course Video Details 

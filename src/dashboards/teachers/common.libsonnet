@@ -41,7 +41,10 @@ local common = import '../common.libsonnet';
       course_key: $.queries.course_key,
       school_course_session: $.queries.school_course_session,
     },
-
+    downloads: '%(video_query)s AND verb.id:"%(verb_downloaded)s"' % {
+      video_query: $.queries.video_id,
+      verb_downloaded: common.verb_ids.downloaded,
+    },
     edx_course_key: 'SELECT `key` FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
     school_course_session: '%(school)s:${SCHOOL:doublequote} AND %(course)s:${COURSE:doublequote} AND %(session)s:${SESSION:doublequote}' % {
       course: common.utils.single_escape_string(common.fields.course),

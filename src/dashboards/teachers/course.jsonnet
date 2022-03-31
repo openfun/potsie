@@ -3,7 +3,6 @@
 local grafana = import 'grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
 local elasticsearch = grafana.elasticsearch;
-local barGaugePanel = grafana.barGaugePanel;
 local graphPanel = grafana.graphPanel;
 local statPanel = grafana.statPanel;
 local sql = grafana.sql;
@@ -30,14 +29,22 @@ dashboard.new(
 .addTemplate(teachers_common.templates.course_video_ids_with_uuid)
 .addPanel(
   text.new(
-    title='Course information',
+    title='Course title',
     content=|||
       # ${TITLE}
+    |||
+  ),
+  gridPos={ x: 0, y: 0, w: 12, h: 4.5 }
+)
+.addPanel(
+  text.new(
+    title='Course dates',
+    content=|||
       ## Started: ${START_DATE} 
       ## Ended: ${END_DATE}
     |||
   ),
-  gridPos={ x: 0, y: 6, w: 4, h: 9 }
+  gridPos={ x: 0, y: 3, w: 4, h: 4.5 }
 )
 .addPanel(
   statPanel.new(
@@ -67,7 +74,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 4, y: 9, w: 4, h: 9 }
+  gridPos={ x: 4, y: 3, w: 4, h: 4.5 }
 )
 .addPanel(
   statPanel.new(
@@ -85,18 +92,26 @@ dashboard.new(
       format='table'
     )
   ),
-  gridPos={ x: 8, y: 9, w: 4, h: 9 }
+  gridPos={ x: 8, y: 3, w: 4, h: 4.5 }
 )
 .addPanel(
   graphPanel.new(
-    title='Views by %(statements_interval)s' % { statements_interval: teachers_common.constants.statements_interval },
+    title='Daily statistics',
     description=|||
+      Daily views, complete views and downloads of the video.
+
       A view is counted when the user has clicked the play button in the interface
       in the first %(view_count_threshold)s seconds of the video.
+
+      A complete view is counted when the user has viewed the video 
+      at least up to the completion threshold.
+
+      A download is counted when the user downloads the video files from Marsha.
     ||| % { view_count_threshold: teachers_common.constants.view_count_threshold },
     datasource=common.datasources.lrs,
   ).addTarget(
     elasticsearch.target(
+      alias='Views',
       datasource=common.datasources.lrs,
       query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
         course_query: teachers_common.queries.course_query,
@@ -105,11 +120,68 @@ dashboard.new(
         view_count_threshold: teachers_common.constants.view_count_threshold,
       },
       metrics=[common.metrics.count],
-      bucketAggs=[common.objects.date_histogram('%(statements_interval)s' % { statements_interval: teachers_common.constants.statements_interval })],
+      bucketAggs=[
+        {
+          id: 'date',
+          field: '@timestamp',
+          type: 'date_histogram',
+          settings: {
+            interval: '1d',
+            min_doc_count: '0',
+            trimEdges: '0',
+          },
+        },
+      ],
+      timeField='@timestamp'
+    )
+  ).addTarget(
+    elasticsearch.target(
+      alias='Complete views',
+      datasource=common.datasources.lrs,
+      query='(%(course_query)s) AND verb.id:"%(verb_completed)s"' % {
+        course_query: teachers_common.queries.course_query,
+        verb_completed: common.verb_ids.completed,
+      },
+      metrics=[common.metrics.count],
+      bucketAggs=[
+        {
+          id: 'date',
+          field: '@timestamp',
+          type: 'date_histogram',
+          settings: {
+            interval: '1d',
+            min_doc_count: '0',
+            trimEdges: '0',
+          },
+        },
+      ],
+      timeField='@timestamp'
+    )
+  ).addTarget(
+    elasticsearch.target(
+      alias='Downloads',
+      datasource=common.datasources.lrs,
+      query='(%(course_query)s) AND verb.id:"%(verb_downloaded)s"' % {
+        course_query: teachers_common.queries.course_query,
+        verb_downloaded: common.verb_ids.downloaded,
+      },
+      metrics=[common.metrics.count],
+      bucketAggs=[
+        {
+          id: 'date',
+          field: '@timestamp',
+          type: 'date_histogram',
+          settings: {
+            interval: '1d',
+            min_doc_count: '0',
+            trimEdges: '0',
+          },
+        },
+      ],
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 12, y: 9, w: 12, h: 9 }
+  gridPos={ x: 0, y: 9, w: 24, h: 12 }
 )
 .addPanel(
   statPanel.new(
@@ -139,7 +211,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 12, y: 18, w: 4, h: 4.5 }
+  gridPos={ x: 12, y: 0, w: 4, h: 4.5 }
 )
 .addPanel(
   statPanel.new(
@@ -179,7 +251,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 16, y: 18, w: 4, h: 4.5 }
+  gridPos={ x: 16, y: 0, w: 4, h: 4.5 }
 )
 .addPanel(
   statPanel.new(
@@ -217,7 +289,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 20, y: 18, w: 4, h: 4.5 }
+  gridPos={ x: 20, y: 0, w: 4, h: 4.5 }
 )
 .addPanel(
   statPanel.new(
@@ -242,7 +314,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 12, y: 22.5, w: 4, h: 4.5 }
+  gridPos={ x: 12, y: 4.5, w: 4, h: 4.5 }
 )
 .addPanel(
   statPanel.new(
@@ -281,7 +353,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 16, y: 22.5, w: 4, h: 4.5 }
+  gridPos={ x: 16, y: 4.5, w: 4, h: 4.5 }
 )
 .addPanel(
   statPanel.new(
@@ -317,202 +389,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 20, y: 22.5, w: 4, h: 4.5 }
-)
-.addPanel(
-  barGaugePanel.new(
-    title='Views by video',
-    description=|||
-      The total count of views by video.
-    |||,
-    datasource=common.datasources.lrs,
-  ).addTarget(
-    elasticsearch.target(
-      datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
-        course_query: teachers_common.queries.course_query,
-        verb_played: common.verb_ids.played,
-        time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
-        view_count_threshold: teachers_common.constants.view_count_threshold,
-      },
-      metrics=[common.metrics.count],
-      bucketAggs=[
-        {
-          field: common.fields.video_id,
-          id: '2',
-          settings: {
-            min_doc_count: '1',
-            order: 'desc',
-            orderBy: '_count',
-            size: '0',
-          },
-          type: 'terms',
-        },
-      ],
-      timeField='@timestamp'
-    )
-  ) + {
-    options: {
-      displayMode: 'gradient',
-      orientation: 'horizontal',
-      reduceOptions: {
-        calcs: [
-          'lastNotNull',
-        ],
-        fields: '/^Count$/',
-        limit: 500,
-        values: true,
-      },
-      showUnfilled: true,
-    },
-    fieldConfig: {
-      defaults: {
-        color: { mode: 'thresholds' },
-      },
-    },
-  },
-  gridPos={ x: 0, y: 27, w: 12, h: 9 }
-)
-.addPanel(
-  {
-    title: 'Statements by user',
-    description: |||
-      The count of statements by user.
-      On the X-axis is the number of statements.
-      On the Y-axis is the number of users.
-    |||,
-    datasource: common.datasources.lrs,
-    fieldConfig: {
-      defaults: {
-        color: {
-          mode: 'palette-classic',
-        },
-        displayName: 'User',
-      },
-    },
-    targets: [
-      {
-        bucketAggs: [
-          {
-            field: '@timestamp',
-            id: '2',
-            settings: {
-              interval: '1h',
-              min_doc_count: '1',
-            },
-            type: 'date_histogram',
-          },
-          {
-            field: common.fields.actor_account_name,
-            id: '3',
-            settings: {
-              min_doc_count: '1',
-              order: 'desc',
-              orderBy: '_term',
-              size: '0',
-            },
-            type: 'terms',
-          },
-        ],
-        metrics: [common.metrics.count],
-        query: teachers_common.queries.course_query,
-        refId: 'A',
-        timeField: '@timestamp',
-      },
-    ],
-    transformations: [
-      {
-        id: 'groupBy',
-        options: {
-          fields: {
-            Count: {
-              aggregations: [
-                'sum',
-              ],
-              operation: 'aggregate',
-            },
-            [common.fields.actor_account_name]: {
-              operation: 'groupby',
-            },
-          },
-        },
-      },
-    ],
-    type: 'histogram',
-  },
-  gridPos={ x: 0, y: 36, w: 12, h: 9 }
-)
-.addPanel(
-  {
-    title: 'Completed videos by user',
-    description: |||
-      The distribution of the number of times users completed videos.
-      On the X-axis is the number of completed videos.
-      On the Y-axis is the number of users.
-    |||,
-    datasource: common.datasources.lrs,
-    fieldConfig: {
-      defaults: {
-        color: {
-          mode: 'palette-classic',
-        },
-        displayName: 'User',
-      },
-    },
-    targets: [
-      {
-        bucketAggs: [
-          {
-            field: '@timestamp',
-            id: '2',
-            settings: {
-              interval: '3600000',
-              min_doc_count: '1',
-            },
-            type: 'histogram',
-          },
-          {
-            field: common.fields.actor_account_name,
-            id: '3',
-            settings: {
-              min_doc_count: '1',
-              order: 'desc',
-              orderBy: '_term',
-              size: '0',
-            },
-            type: 'terms',
-          },
-        ],
-        metrics: [common.metrics.count],
-        query: '(%(course_query)s) AND verb.id:"%(completed)s"' % {
-          course_query: teachers_common.queries.course_query,
-          completed: common.verb_ids.completed,
-        },
-        refId: 'A',
-        timeField: '@timestamp',
-      },
-    ],
-    transformations: [
-      {
-        id: 'groupBy',
-        options: {
-          fields: {
-            Count: {
-              aggregations: [
-                'sum',
-              ],
-              operation: 'aggregate',
-            },
-            [common.fields.actor_account_name]: {
-              operation: 'groupby',
-            },
-          },
-        },
-      },
-    ],
-    type: 'histogram',
-  },
-  gridPos={ x: 0, y: 44, w: 12, h: 9 }
+  gridPos={ x: 20, y: 4.5, w: 4, h: 4.5 }
 )
 .addPanel(
   {
@@ -660,6 +537,50 @@ dashboard.new(
       {
         bucketAggs: [
           {
+            field: '@timestamp',
+            id: '2',
+            settings: {
+              interval: 'auto',
+            },
+            type: 'date_histogram',
+          },
+        ],
+        datasource: common.datasources.marsha,
+        format: 'table',
+        hide: false,
+        metricColumn: 'none',
+        metrics: [
+          {
+            id: '1',
+            type: 'count',
+          },
+        ],
+        query: '',
+        rawQuery: true,
+        rawSql: "SELECT 'uuid://' || id AS \"object.id.keyword\",title FROM video where id IN (${COURSE_VIDEOS_IDS:sqlstring})",
+        refId: 'B',
+        select: [
+          [
+            {
+              params: [
+                'value',
+              ],
+              type: 'column',
+            },
+          ],
+        ],
+        timeColumn: 'time',
+        timeField: '@timestamp',
+        where: [
+          {
+            name: '$__timeFilter',
+            type: 'macro',
+          },
+        ],
+      },
+      {
+        bucketAggs: [
+          {
             id: 'name',
             field: common.fields.video_id,
             type: 'terms',
@@ -728,51 +649,7 @@ dashboard.new(
         refId: 'Videos complete unique views query',
         timeField: '@timestamp',
       },
-      {
-        bucketAggs: [
-          {
-            field: '@timestamp',
-            id: '2',
-            settings: {
-              interval: 'auto',
-            },
-            type: 'date_histogram',
-          },
-        ],
-        datasource: common.datasources.marsha,
-        format: 'table',
-        hide: false,
-        metricColumn: 'none',
-        metrics: [
-          {
-            id: '1',
-            type: 'count',
-          },
-        ],
-        query: '',
-        rawQuery: true,
-        rawSql: "SELECT 'uuid://' || id AS \"object.id.keyword\",title FROM video where id IN (${COURSE_VIDEOS_IDS:sqlstring})",
-        refId: 'B',
-        select: [
-          [
-            {
-              params: [
-                'value',
-              ],
-              type: 'column',
-            },
-          ],
-        ],
-        timeColumn: 'time',
-        timeField: '@timestamp',
-        where: [
-          {
-            name: '$__timeFilter',
-            type: 'macro',
-          },
-        ],
-      },
     ],
   },
-  gridPos={ x: 12, y: 36, w: 12, h: 18 }
+  gridPos={ x: 0, y: 12, w: 24, h: 18 }
 )

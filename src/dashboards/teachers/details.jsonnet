@@ -176,10 +176,7 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_query)s AND verb.id:"%(verb_downloaded)s"' % {
-        video_query: teachers_common.queries.video_id,
-        verb_downloaded: common.verb_ids.downloaded,
-      },
+      query=teachers_common.queries.downloads,
       metrics=[common.metrics.count],
       bucketAggs=[
         {
@@ -233,16 +230,64 @@ dashboard.new(
 )
 .addPanel(
   graphPanel.new(
-    title='Daily views',
+    title='Daily statistics',
     description=|||
+      Daily views, complete views and downloads of the video.
+
       A view is counted when the user has clicked the play button in the interface
       in the first %(view_count_threshold)s seconds of the video.
+
+      A complete view is counted when the user has viewed the video 
+      at least up to the completion threshold.
+
+      A download is counted when the user downloads the video files from Marsha.
     ||| % { view_count_threshold: teachers_common.constants.view_count_threshold },
     datasource=common.datasources.lrs,
   ).addTarget(
     elasticsearch.target(
+      alias='Views',
       datasource=common.datasources.lrs,
       query=teachers_common.queries.views,
+      metrics=[common.metrics.count],
+      bucketAggs=[
+        {
+          id: 'date',
+          field: '@timestamp',
+          type: 'date_histogram',
+          settings: {
+            interval: '1d',
+            min_doc_count: '0',
+            trimEdges: '0',
+          },
+        },
+      ],
+      timeField='@timestamp'
+    )
+  ).addTarget(
+    elasticsearch.target(
+      alias='Complete views',
+      datasource=common.datasources.lrs,
+      query=teachers_common.queries.complete_views,
+      metrics=[common.metrics.count],
+      bucketAggs=[
+        {
+          id: 'date',
+          field: '@timestamp',
+          type: 'date_histogram',
+          settings: {
+            interval: '1d',
+            min_doc_count: '0',
+            trimEdges: '0',
+          },
+        },
+      ],
+      timeField='@timestamp'
+    )
+  ).addTarget(
+    elasticsearch.target(
+      alias='Downloads',
+      datasource=common.datasources.lrs,
+      query=teachers_common.queries.downloads,
       metrics=[common.metrics.count],
       bucketAggs=[
         {
