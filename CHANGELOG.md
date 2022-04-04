@@ -10,10 +10,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ### Added
 
+- Implement post-deployment hooks
 - Improve dashboards layout on Teachers Video Dashboard
-- Videos views table on Teachers Course Video Overview Dashboard linked 
+- Videos views table on Teachers Course Video Overview Dashboard linked
 with corresponding Teachers Course Video Details Dashboard
-- Video interaction activities details on Teachers Course Video Details 
+- Video interaction activities details on Teachers Course Video Details
   Dashboard
 - Average views and complete views numbers in Teachers Course Video Overview
   Dashboard

@@ -90,7 +90,17 @@ services:
       - ./fixtures/mysql/edxapp.sql:/docker-entrypoint-initdb.d/init.sql
 
   curl:
-    image: curlimages/curl:latest
+    image: fundocker/curl-jq:latest
+    entrypoint: /usr/local/bin/curl
+
+  hooks:
+    image: fundocker/curl-jq:latest
+    env_file:
+      - env.d/hooks
+    working_dir: /src/hooks
+    volumes:
+      - ./var/lib/grafana/dashboards:/var/lib/grafana/dashboards
+      - ./src/hooks:/src/hooks
 
   dockerize:
     image: jwilder/dockerize
