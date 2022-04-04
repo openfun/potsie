@@ -40,7 +40,7 @@ dashboard.new(
   text.new(
     title='Course dates',
     content=|||
-      ## Started: ${START_DATE} 
+      ## Started: ${START_DATE}
       ## Ended: ${END_DATE}
     |||
   ),
@@ -103,7 +103,7 @@ dashboard.new(
       A view is counted when the user has clicked the play button in the interface
       in the first %(view_count_threshold)s seconds of the video.
 
-      A complete view is counted when the user has viewed the video 
+      A complete view is counted when the user has viewed the video
       at least up to the completion threshold.
 
       A download is counted when the user downloads the video files from Marsha.
@@ -432,7 +432,7 @@ dashboard.new(
                 {
                   targetBlank: true,
                   title: 'View detailled insights about this video',
-                  url: '/d/_3iCqpynk/details?orgId=1&var-EDX_COURSE_KEY=${EDX_COURSE_KEY}&var-VIDEO=${__value.text}',
+                  url: '/d/%%teachers_folder_uid%%/details?orgId=1&var-EDX_COURSE_KEY=${EDX_COURSE_KEY}&var-VIDEO=${__value.text}',
                 },
               ],
             },

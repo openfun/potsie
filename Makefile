@@ -49,7 +49,8 @@ bootstrap: \
 	plugins \
 	build \
 	compile \
-	fixtures
+	fixtures \
+	hooks
 bootstrap: ## bootstrap the application
 .PHONY: bootstrap
 
@@ -92,6 +93,10 @@ fixtures: ## Load test data (for development)
 format: ## format Jsonnet sources and libraries
 	bin/jsonnetfmt -i $(sources) $(libraries)
 .PHONY: format
+
+hooks: ## run post-deployment hooks
+	@$(COMPOSE_RUN) hooks ./post-deploy
+.PHONY: hooks
 
 lint: ## lint Jsonnet sources and libraries
 	bin/jsonnet-lint $(sources) $(libraries)
