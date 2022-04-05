@@ -432,7 +432,7 @@ dashboard.new(
                 {
                   targetBlank: true,
                   title: 'View detailled insights about this video',
-                  url: '/d/%%teachers_folder_uid%%/details?orgId=1&var-EDX_COURSE_KEY=${EDX_COURSE_KEY}&var-VIDEO=${__value.text}',
+                  url: '/d/%%teachers_folder_uid%%/details?orgId=1&${EDX_COURSE_KEY:queryparam}&var-VIDEO=${__value.text}',
                 },
               ],
             },
