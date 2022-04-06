@@ -12,6 +12,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Hooks should be included in releases along with compiled dashboards and
   plugins
+- Make post-deploy hooks more reliable
 
 ## [0.4.0] - 2022-04-06
 
