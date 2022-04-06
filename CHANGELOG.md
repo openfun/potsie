@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Course videos metrics were improperly collected
+
 ## [0.4.2] - 2022-04-06
 
 ### Fixed

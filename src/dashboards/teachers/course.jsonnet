@@ -58,7 +58,7 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query=teachers_common.queries.course_query,
+      query=teachers_common.queries.course_videos,
       metrics=[common.metrics.count],
       bucketAggs=[
         {
@@ -113,8 +113,8 @@ dashboard.new(
     elasticsearch.target(
       alias='Views',
       datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
-        course_query: teachers_common.queries.course_query,
+      query='%(course_videos)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+        course_videos: teachers_common.queries.course_videos,
         verb_played: common.verb_ids.played,
         time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
         view_count_threshold: teachers_common.constants.view_count_threshold,
@@ -138,8 +138,8 @@ dashboard.new(
     elasticsearch.target(
       alias='Complete views',
       datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_completed)s"' % {
-        course_query: teachers_common.queries.course_query,
+      query='%(course_videos)s AND verb.id:"%(verb_completed)s"' % {
+        course_videos: teachers_common.queries.course_videos,
         verb_completed: common.verb_ids.completed,
       },
       metrics=[common.metrics.count],
@@ -161,8 +161,8 @@ dashboard.new(
     elasticsearch.target(
       alias='Downloads',
       datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_downloaded)s"' % {
-        course_query: teachers_common.queries.course_query,
+      query='%(course_videos)s AND verb.id:"%(verb_downloaded)s"' % {
+        course_videos: teachers_common.queries.course_videos,
         verb_downloaded: common.verb_ids.downloaded,
       },
       metrics=[common.metrics.count],
@@ -200,8 +200,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
-        course_query: teachers_common.queries.course_query,
+      query='%(course_videos)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+        course_videos: teachers_common.queries.course_videos,
         verb_played: common.verb_ids.played,
         time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
         view_count_threshold: teachers_common.constants.view_count_threshold,
@@ -228,8 +228,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
-        course_query: teachers_common.queries.course_query,
+      query='%(course_videos)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+        course_videos: teachers_common.queries.course_videos,
         verb_played: common.verb_ids.played,
         time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
         view_count_threshold: teachers_common.constants.view_count_threshold,
@@ -266,8 +266,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
-        course_query: teachers_common.queries.course_query,
+      query='%(course_videos)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+        course_videos: teachers_common.queries.course_videos,
         verb_played: common.verb_ids.played,
         time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
         view_count_threshold: teachers_common.constants.view_count_threshold,
@@ -305,8 +305,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_completed)s"' % {
-        course_query: teachers_common.queries.course_query,
+      query='%(course_videos)s AND verb.id:"%(verb_completed)s"' % {
+        course_videos: teachers_common.queries.course_videos,
         verb_completed: common.verb_ids.completed,
       },
       metrics=[common.metrics.count],
@@ -332,8 +332,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_completed)s"' % {
-        course_query: teachers_common.queries.course_query,
+      query='%(course_videos)s AND verb.id:"%(verb_completed)s"' % {
+        course_videos: teachers_common.queries.course_videos,
         verb_completed: common.verb_ids.completed,
       },
       metrics=[common.metrics.cardinality(common.fields.actor_account_name)],
@@ -368,8 +368,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='(%(course_query)s) AND verb.id:"%(verb_completed)s"' % {
-        course_query: teachers_common.queries.course_query,
+      query='%(course_videos)s AND verb.id:"%(verb_completed)s"' % {
+        course_videos: teachers_common.queries.course_videos,
         verb_completed: common.verb_ids.completed,
       },
       metrics=[common.metrics.count],
@@ -525,8 +525,8 @@ dashboard.new(
             type: 'count',
           },
         ],
-        query: '(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
-          course_query: teachers_common.queries.course_query,
+        query: '%(course_videos)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+          course_videos: teachers_common.queries.course_videos,
           verb_played: common.verb_ids.played,
           time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
           view_count_threshold: teachers_common.constants.view_count_threshold,
@@ -594,8 +594,8 @@ dashboard.new(
         ],
         datasource: common.datasources.lrs,
         metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
-        query: '(%(course_query)s) AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
-          course_query: teachers_common.queries.course_query,
+        query: '%(course_videos)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+          course_videos: teachers_common.queries.course_videos,
           verb_played: common.verb_ids.played,
           time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
           view_count_threshold: teachers_common.constants.view_count_threshold,
@@ -619,8 +619,8 @@ dashboard.new(
         ],
         datasource: common.datasources.lrs,
         metrics: [common.metrics.count],
-        query: '(%(course_query)s) AND verb.id:"%(verb_completed)s"' % {
-          course_query: teachers_common.queries.course_query,
+        query: '%(course_videos)s AND verb.id:"%(verb_completed)s"' % {
+          course_videos: teachers_common.queries.course_videos,
           verb_completed: common.verb_ids.completed,
         },
         refId: 'Videos complete views query',
@@ -642,8 +642,8 @@ dashboard.new(
         ],
         datasource: common.datasources.lrs,
         metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
-        query: '(%(course_query)s) AND verb.id:"%(verb_completed)s"' % {
-          course_query: teachers_common.queries.course_query,
+        query: '%(course_videos)s AND verb.id:"%(verb_completed)s"' % {
+          course_videos: teachers_common.queries.course_videos,
           verb_completed: common.verb_ids.completed,
         },
         refId: 'Videos complete unique views query',

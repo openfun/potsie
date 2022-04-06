@@ -41,6 +41,7 @@ local common = import '../common.libsonnet';
       course_key: $.queries.course_key,
       school_course_session: $.queries.school_course_session,
     },
+    course_videos: 'object.id.keyword:${COURSE_VIDEOS_IDS_WITH_UUID:lucene}',
     downloads: '%(video_query)s AND verb.id:"%(verb_downloaded)s"' % {
       video_query: $.queries.video_id,
       verb_downloaded: common.verb_ids.downloaded,
