@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [0.4.1] - 2022-04-06
+
 ### Fixed
 
 - Hooks should be included in releases along with compiled dashboards and
@@ -77,7 +79,8 @@ with corresponding Teachers Course Video Details Dashboard
 
 - Video details Dashboard
 
-[unreleased]: https://github.com/openfun/potsie/compare/v0.4.0...main
+[unreleased]: https://github.com/openfun/potsie/compare/v0.4.1...main
+[0.4.1]: https://github.com/openfun/potsie/compare/v0.4.0...v0.4.1
 [0.4.0]: https://github.com/openfun/potsie/compare/v0.3.0...v0.4.0
 [0.3.0]: https://github.com/openfun/potsie/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/openfun/potsie/compare/v0.1.0...v0.2.0
