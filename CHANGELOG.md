@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Restore post-deploy hook folder uid checking
+
 ## [0.4.1] - 2022-04-06
 
 ### Fixed

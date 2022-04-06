@@ -15,10 +15,12 @@ teachers_folder_uid=$(
   jq -r .[0].uid
 )
 
-if [[ -z teachers_folder_uid ]]; then
+if [ -z "${teachers_folder_uid}" ]; then
   echo "Teachers folder not found!"
   exit 1
 fi
 
 # Substitute
 sed -i "s/%%teachers_folder_uid%%/${teachers_folder_uid}/g" "${COURSE_DASHBOARD_PATH}"
+
+echo "post-deploy hook done."
