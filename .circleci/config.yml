@@ -122,6 +122,23 @@ jobs:
           paths:
             - var/lib/grafana/plugins
 
+  # Distribute hooks
+  hooks:
+    docker:
+      - image: debian:stretch
+    working_directory: ~/fun
+    steps:
+      - checkout
+      - run:
+          name: Copy hooks to presisted workspace
+          command: |
+            mkdir -p var/lib/grafana/
+            cp -R src/hooks var/lib/grafana/
+      - persist_to_workspace:
+          root: .
+          paths:
+            - var/lib/grafana/hooks
+
   # Make a new github release
   release:
     docker:
@@ -229,6 +246,10 @@ workflows:
           filters:
             tags:
               only: /.*/
+      - hooks:
+          filters:
+            tags:
+              only: /.*/
 
       # Release
       - release:
@@ -236,6 +257,7 @@ workflows:
             - lint
             - compile
             - plugins
+            - hooks
           filters:
             branches:
               only: main
