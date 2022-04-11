@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS student_courseenrollment (
     `course_id` VARCHAR(255),
     `is_active` INT
 );
-INSERT INTO courses_course (id, `key`, `title`, `start_date`, `end_date`) VALUES (1, 'course-v1:FUN-MOOC+00001+session01', 'FUN Mooc Course 1 Session 1', DATE('2000-01-01'), DATE('2030-01-01'));
-INSERT INTO courses_course (id, `key`, `title`, `start_date`, `end_date`) VALUES (2, 'course-v1:FUN-MOOC+00002+session01', 'FUN Mooc Course 2 Session 2', DATE('2000-01-01'), DATE('2030-01-01'));
+INSERT INTO courses_course (id, `key`, `title`, `start_date`, `end_date`) VALUES (1, 'course-v1:FUN-MOOC+00001+session01', 'FUN Mooc Course 1 Session 1', DATE_SUB(NOW(),INTERVAL 2 MONTH), DATE_ADD(NOW(),INTERVAL 2 MONTH));
+INSERT INTO courses_course (id, `key`, `title`, `start_date`, `end_date`) VALUES (2, 'course-v1:FUN-MOOC+00002+session01', 'FUN Mooc Course 2 Session 2', DATE_SUB(NOW(),INTERVAL 2 MONTH), DATE_ADD(NOW(),INTERVAL 2 MONTH));
 INSERT INTO student_courseaccessrole (id, `user_id`, `course_id`, `role`) VALUES (1, 1, 'course-v1:FUN-MOOC+00001+session01', 'staff');
 INSERT INTO student_courseaccessrole (id, `user_id`, `course_id`, `role`) VALUES (2, 1, 'course-v1:FUN-MOOC+00002+session01', 'instructor');
 INSERT INTO auth_user (id, email, username) VALUES (1, 'teacher@example.org', 'teacher');
