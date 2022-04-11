@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Fix demo date courses according to the current date
+
 ## [0.4.3] - 2022-04-07
 
 ### Fixed
