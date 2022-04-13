@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Removed
+
+- Platform/general dashboard is not used in any context
+
 ### Changed
 
 - Fix demo date courses according to the current date
