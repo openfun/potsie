@@ -66,6 +66,12 @@ services:
       - ./scripts:/scripts
     command: python scripts/patch_statements_date.py
 
+  users-permissions:
+    image: fundocker/curl-jq:latest
+    user: "${DOCKER_USER:-1000}"
+    volumes:
+      - ./scripts:/scripts
+
   ralph:
     image: fundocker/ralph:latest
     user: "${DOCKER_USER:-1000}"
