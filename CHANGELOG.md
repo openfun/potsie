@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [0.5.0] - 2022-04-22
+
 ### Removed
 
 - Platform/general dashboard is not used in any context
@@ -99,7 +101,8 @@ with corresponding Teachers Course Video Details Dashboard
 
 - Video details Dashboard
 
-[unreleased]: https://github.com/openfun/potsie/compare/v0.4.3...main
+[unreleased]: https://github.com/openfun/potsie/compare/v0.5.0...main
+[0.5.0]: https://github.com/openfun/potsie/compare/v0.4.3...v0.5.0
 [0.4.3]: https://github.com/openfun/potsie/compare/v0.4.2...v0.4.3
 [0.4.2]: https://github.com/openfun/potsie/compare/v0.4.1...v0.4.2
 [0.4.1]: https://github.com/openfun/potsie/compare/v0.4.0...v0.4.1
