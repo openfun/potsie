@@ -238,7 +238,7 @@ dashboard.new(
       bucketAggs=[
         {
           id: 'name',
-          field: common.fields.actor_account_name,
+          field: common.fields.video_id,
           type: 'terms',
           settings: {
             order: 'desc',
@@ -340,7 +340,7 @@ dashboard.new(
       bucketAggs=[
         {
           id: '5',
-          field: common.fields.actor_account_name,
+          field: common.fields.video_id,
           type: 'terms',
           settings: {
             min_doc_count: '0',
