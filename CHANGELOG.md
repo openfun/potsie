@@ -8,6 +8,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [0.5.1] - 2022-05-04
+
+## Fixed
+
+- Fix aggregation of unique (complete) views on video ids
+
 ## [0.5.0] - 2022-04-22
 
 ### Removed
