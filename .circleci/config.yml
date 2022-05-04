@@ -170,7 +170,7 @@ jobs:
           name: Build release archive
           command: |
             mkdir releases
-            tar cvzf releases/postie-${RELEASE}.tgz -C ~/fun var/lib/grafana
+            tar cvzf releases/potsie-${RELEASE}.tgz -C ~/fun var/lib/grafana
       - run:
           name: Get release changes
           command: |
