@@ -16,6 +16,7 @@ dashboard.new(
   tags=[common.tags.xapi, common.tags.video, common.tags.teacher],
   editable=false,
   time_from='now-90d',
+  uid=common.uids.course_video_overview,
 )
 .addLink(teachers_common.link.teacher)
 .addTemplate(teachers_common.templates.edx_course_key)
@@ -432,7 +433,9 @@ dashboard.new(
                 {
                   targetBlank: true,
                   title: 'View detailled insights about this video',
-                  url: '/d/%%teachers_folder_uid%%/details?orgId=1&${EDX_COURSE_KEY:queryparam}&var-VIDEO=${__value.text}',
+                  url: '/d/%(course_video_details_uid)s/details?orgId=1&${EDX_COURSE_KEY:queryparam}&var-VIDEO=${__value.text}' % {
+                    course_video_details_uid: common.uids.course_video_details,
+                  },
                 },
               ],
             },

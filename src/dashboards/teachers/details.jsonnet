@@ -14,6 +14,7 @@ dashboard.new(
   tags=[common.tags.xapi, common.tags.video, common.tags.teacher],
   editable=false,
   time_from='now-90d',
+  uid=common.uids.course_video_details,
 )
 .addLink(teachers_common.link.teacher)
 .addTemplate(teachers_common.templates.edx_course_key)

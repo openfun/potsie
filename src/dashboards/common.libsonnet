@@ -54,6 +54,11 @@
     double_escape_string(x):: std.strReplace(std.strReplace(std.strReplace(x, ':', '\\\\:'), '/', '\\\\/'), '-', '\\\\-'),
     single_escape_string(x):: std.strReplace(std.strReplace(std.strReplace(x, ':', '\\:'), '/', '\\/'), '-', '\\-'),
   },
+  uids: {
+    course_video_overview: '855bbd9f-09eb-42ac-aa5f-d0a2c6f8ee34',
+    course_video_details: 'c6cc2218-4fea-4b4c-a622-245f3aa22893',
+    teachers_home: '451f4aa3-d094-429e-ad87-4b6c809ffa35',
+  },
   verb_ids: {
     completed: 'http://adlnet.gov/expapi/verbs/completed',
     initialized: 'http://adlnet.gov/expapi/verbs/initialized',
