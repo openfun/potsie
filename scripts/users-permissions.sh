@@ -37,6 +37,21 @@ if [ "${TEACHER_TEAM_ID}" = "null" ]; then
     )
 fi
 
+# Set "teacher" teams home dashboard
+TEACHER_HOME_DASHBOARD_ID=$(
+    CURL \
+        "${BASE_URL}/api/search?query=Teachers%20home&type=dash-db" | \
+    jq -r .[0].id
+)
+
+payload=$(to_json "{'homeDashboardId': ${TEACHER_HOME_DASHBOARD_ID}}")
+TEACHER_PREFERENCES=$(
+    CURL \
+        -X PUT \
+        -d "${payload}" \
+        "${BASE_URL}/api/teams/${TEACHER_TEAM_ID}/preferences"
+)
+
 # Create "teacher" user if not exist
 TEACHER_USER_ID=$(
     CURL \
