@@ -2,25 +2,4 @@
 
 set -e
 
-GRAFANA_AUTH="${GRAFANA_API_USER}:${GRAFANA_API_PASSWORD}"
-GRAFANA_ROOT_URL="${GRAFANA_ROOT_URL:-http://grafana:3000}"
-REQUEST_CONTENT_TYPE="Content-Type: application/json"
-COURSE_DASHBOARD_PATH="/var/lib/grafana/dashboards/teachers/course.json"
-
-# Get teachers dashboard uid
-teachers_folder_uid=$(
-  curl -s -u "${GRAFANA_AUTH}" \
-    -H "${REQUEST_CONTENT_TYPE}" \
-    "${GRAFANA_ROOT_URL}/api/search?query=Course%20video%20details&type=dash-db" | \
-  jq -r .[0].uid
-)
-
-if [ -z "${teachers_folder_uid}" ]; then
-  echo "Teachers folder not found!"
-  exit 1
-fi
-
-# Substitute
-sed -i "s/%%teachers_folder_uid%%/${teachers_folder_uid}/g" "${COURSE_DASHBOARD_PATH}"
-
-echo "post-deploy hook done."
+echo "hello-world hook done."

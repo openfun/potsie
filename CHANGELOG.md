@@ -21,6 +21,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Release assets file name is now properly named 😬
 
+### Removed
+
+- Post-deploy hook for dashboard uids
+
 ## [0.5.1] - 2022-05-04
 
 ### Fixed
