@@ -16,6 +16,7 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Changed
 
 - Switch default Grafana theme to `light`
+- Upgrade `Grafana` to 8.5.2
 
 ### Fixed
 
