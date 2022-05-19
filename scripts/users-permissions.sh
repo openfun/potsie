@@ -40,7 +40,7 @@ fi
 # Set "teacher" teams home dashboard
 TEACHER_HOME_DASHBOARD_ID=$(
     CURL \
-        "${BASE_URL}/api/search?query=Teachers%20home&type=dash-db" | \
+        "${BASE_URL}/api/search?tag=teacher&query=Home&type=dash-db" | \
     jq -r .[0].id
 )
 
