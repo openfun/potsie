@@ -81,10 +81,11 @@ services:
       - RALPH_ES_INDEX=statements
 
   elasticsearch:
-    image: elasticsearch:7.16.2
+    image: elasticsearch:8.2.0
     mem_limit: 2g
     environment:
       discovery.type: single-node
+      xpack.security.enabled: "false"
     ports:
       - "9200:9200"
 
