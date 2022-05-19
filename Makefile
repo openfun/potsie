@@ -86,7 +86,7 @@ fixtures: ## Load test data (for development)
 	@$(WAIT_MYSQL)
 	zcat ./fixtures/elasticsearch/lrs.json.gz | \
 	  $(COMPOSE_RUN) patch_statements_date | \
-	  $(COMPOSE_RUN) ralph push -b es --es-index statements-fixtures  && \
+	  $(COMPOSE_RUN) -T ralph push -b es --es-index statements-fixtures  && \
 	  $(COMPOSE_RUN) users-permissions sh /scripts/users-permissions.sh
 .PHONY: fixtures
 
