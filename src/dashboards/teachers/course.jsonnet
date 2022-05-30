@@ -128,7 +128,6 @@ dashboard.new(
           type: 'date_histogram',
           settings: {
             interval: '1d',
-            min_doc_count: '0',
             trimEdges: '0',
           },
         },
@@ -151,7 +150,6 @@ dashboard.new(
           type: 'date_histogram',
           settings: {
             interval: '1d',
-            min_doc_count: '0',
             trimEdges: '0',
           },
         },
@@ -174,7 +172,6 @@ dashboard.new(
           type: 'date_histogram',
           settings: {
             interval: '1d',
-            min_doc_count: '0',
             trimEdges: '0',
           },
         },
@@ -216,10 +213,9 @@ dashboard.new(
 )
 .addPanel(
   statPanel.new(
-    title='Unique views',
+    title='Viewers',
     description=|||
-      Unique views are views aggregated by users: each user can generate
-      at most one view in this metric.
+      Number of enrolled users that played at least one video.
     |||,
     datasource=common.datasources.lrs,
     graphMode='none',
@@ -244,7 +240,6 @@ dashboard.new(
           settings: {
             order: 'desc',
             orderBy: '_count',
-            min_doc_count: '0',
             size: '0',
           },
         },
@@ -282,7 +277,6 @@ dashboard.new(
           settings: {
             order: 'desc',
             orderBy: '_count',
-            min_doc_count: '0',
             size: '0',
           },
         },
@@ -319,11 +313,9 @@ dashboard.new(
 )
 .addPanel(
   statPanel.new(
-    title='Unique complete views',
+    title='Complete viewers',
     description=|||
-      Total number of complete views of selected course session videos.
-      Note that a view is considered as complete when the completion threshold
-      of the video has been reached.
+      Number of users that have viewed completely the video at least once.
     |||,
     datasource=common.datasources.lrs,
     graphMode='none',
@@ -344,7 +336,6 @@ dashboard.new(
           field: common.fields.video_id,
           type: 'terms',
           settings: {
-            min_doc_count: '0',
             size: '0',
             order: 'desc',
             orderBy: '_count',
@@ -382,7 +373,6 @@ dashboard.new(
           settings: {
             order: 'desc',
             orderBy: '_count',
-            min_doc_count: '0',
             size: '0',
           },
         },

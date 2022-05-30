@@ -22,6 +22,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 ### Fixed
 
 - Release assets file name is now properly named 😬
+- Fix `min_doc_count=0` parameter in bucket aggregations leading to unexpected
+  results
 
 ### Removed
 

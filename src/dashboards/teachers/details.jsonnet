@@ -65,10 +65,9 @@ dashboard.new(
 )
 .addPanel(
   statPanel.new(
-    title='Unique views',
+    title='Viewers',
     description=|||
-      Unique views are views aggregated by users: each user can generate
-      at most one view in this metric.
+      Number of enrolled users that played at least one video.
     |||,
     datasource=common.datasources.lrs,
     graphMode='none',
@@ -83,11 +82,11 @@ dashboard.new(
       bucketAggs=[
         {
           id: 'name',
-          field: common.fields.video_id,
+          field: common.fields.actor_account_name,
           settings: {
             order: 'desc',
             orderBy: '_count',
-            min_doc_count: '0',
+            min_doc_count: '1',
             size: '0',
           },
           type: 'terms',
@@ -118,7 +117,7 @@ dashboard.new(
           id: '5',
           field: '@timestamp',
           settings: {
-            interval: 'auto',
+            interval: '1d',
             min_doc_count: '0',
             trimEdges: '0',
           },
@@ -132,9 +131,9 @@ dashboard.new(
 )
 .addPanel(
   statPanel.new(
-    title='Unique complete views',
+    title='Complete viewers',
     description=|||
-      Total number of unique complete views of selected video.
+      Number of users that have viewed completely the video at least once.
     |||,
     datasource=common.datasources.lrs,
     graphMode='none',
@@ -149,9 +148,9 @@ dashboard.new(
       bucketAggs=[
         {
           id: '5',
-          field: common.fields.video_id,
+          field: common.fields.actor_account_name,
           settings: {
-            min_doc_count: '0',
+            min_doc_count: '1',
             size: '0',
             order: 'desc',
             orderBy: '_count',
