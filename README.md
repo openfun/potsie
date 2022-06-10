@@ -3,6 +3,15 @@
 Potsie is a collection of [Grafana](https://grafana.com/grafana/) dashboards
 for learning analytics.
 
+## Sneak peek
+
+We've cooked an up-to-date project demonstration for you! Check this out at
+https://demo.potsie.education using the following credentials:
+
+| Account | Login     | Password    |
+| ------- | --------- | ----------- |
+| Teacher | `teacher` | `funfunfun` |
+
 ## Getting started
 
 Once you have cloned this project, bootstrapping it should be as easy as typing
@@ -106,7 +115,7 @@ The script will ask you a couple of questions and then create your plugin
 in the `./src/plugins/packages` directory using `@grafana/toolkit`.
 
 Then, download the necessary dependencies and build all plugins by running
-the following commands: 
+the following commands:
 
 ```bash
 $ make dependencies
@@ -116,7 +125,7 @@ $ make plugins
 Grab a coffee or tea; this might take a while :coffee:
 
 Finally, add your plugin to the `GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS` in `./env.d/grafana`
-(it's a  comma-separated list of plugin names) and restart Grafana:
+(it's a comma-separated list of plugin names) and restart Grafana:
 
 ```bash
 $ make stop
@@ -138,7 +147,6 @@ plugins package.json file.
 
 Finally, to view your changes on the plugin, create a new panel using the plugin
 in grafana and refresh the panel page in the browser.
-
 
 ## Contributing
 
