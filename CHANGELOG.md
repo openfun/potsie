@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Upgrade `Grafana` to 9.0.3
+
 ## [0.6.0] - 2022-05-31
 
 ### Added
