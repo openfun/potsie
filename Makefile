@@ -3,7 +3,7 @@
 DOCKER_UID           = $(shell id -u)
 DOCKER_GID           = $(shell id -g)
 DOCKER_USER          = $(DOCKER_UID):$(DOCKER_GID)
-COMPOSE              = DOCKER_USER=$(DOCKER_USER) docker-compose
+COMPOSE              = DOCKER_USER=$(DOCKER_USER) docker compose -f docker-compose.yml -f docker-compose-superset.yml
 COMPOSE_RUN          = $(COMPOSE) run --rm
 
 # -- Node
@@ -50,7 +50,8 @@ bootstrap: \
 	build \
 	compile \
 	fixtures \
-	hooks
+	hooks \
+	init-superset
 bootstrap: ## bootstrap the application
 .PHONY: bootstrap
 
@@ -86,7 +87,7 @@ fixtures: ## Load test data (for development)
 	@$(WAIT_MYSQL)
 	zcat ./fixtures/elasticsearch/lrs.json.gz | \
 	  $(COMPOSE_RUN) patch_statements_date | \
-	  $(COMPOSE_RUN) -T ralph push -b es --es-index statements-fixtures  && \
+	  $(COMPOSE_RUN) -T ralph push -b es && \
 	  $(COMPOSE_RUN) users-permissions sh /scripts/users-permissions.sh
 .PHONY: fixtures
 
@@ -98,6 +99,10 @@ hooks: ## run post-deployment hooks
 	@$(COMPOSE_RUN) hooks ./post-deploy
 .PHONY: hooks
 
+init-superset: ## initialize superset
+	@$(COMPOSE) run superset-init
+.PHONY: init-superset
+
 lint: ## lint Jsonnet sources and libraries
 	bin/jsonnet-lint $(sources) $(libraries)
 .PHONY: lint
@@ -105,6 +110,10 @@ lint: ## lint Jsonnet sources and libraries
 logs: ## display grafana logs (follow mode)
 	@$(COMPOSE) logs -f grafana
 .PHONY: logs
+
+logs-superset: ## display superset logs (follow mode)
+	@$(COMPOSE) logs -f superset
+.PHONY: logs-superset
 
 plugins: ## download, build and install plugins
 	@$(YARN) build
@@ -130,6 +139,12 @@ run: ## start the development server
 	@echo "Wait for grafana to be up..."
 	@$(WAIT_GRAFANA)
 .PHONY: run
+
+run-superset: \
+	run
+run-superset: ## start superset server
+	@$(COMPOSE) up -d superset superset-worker superset-worker-beat
+.PHONY: run-superset
 
 status: ## an alias for "docker-compose ps"
 	@$(COMPOSE) ps
