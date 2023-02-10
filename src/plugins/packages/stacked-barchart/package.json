@@ -10,7 +10,7 @@
     "sign": "grafana-toolkit plugin:sign",
     "start": "yarn watch"
   },
-  "author": "GIP FUN MOOC",
+  "author": "France Université Numérique",
   "license": "MIT",
   "devDependencies": {
     "@grafana/data": "latest",
