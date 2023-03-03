@@ -1,21 +1,46 @@
+docker-login: &docker-login
+  # Login to DockerHub
+  #
+  # Nota bene: you'll need to define the following secrets environment vars
+  # in CircleCI interface:
+  #
+  #   - DOCKER_HUB_USER
+  #   - DOCKER_HUB_PASSWORD
+  run:
+    name: Login to DockerHub
+    command: >
+      test -n "$DOCKER_HUB_USER" &&
+        echo "$DOCKER_HUB_PASSWORD" | docker login -u "$DOCKER_HUB_USER" --password-stdin ||
+        echo "Docker Hub anonymous mode"
+
 version: 2.1
 jobs:
-  # Git jobs
+  # ---- Git jobs ----
   # Check that the git history is clean and complies with our expectations
   lint-git:
     docker:
-      - image: circleci/python:3.9-buster
+      - image: cimg/python:3.11
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
+      # Make sure the changes don't add a "print" statement to the code base.
+      # We should exclude the ".circleci" folder from the search as the very command that checks
+      # the absence of "print" is including a "print(" itself.
+      - run:
+          name: enforce absence of print statements in code
+          command: |
+            ! git diff origin/main..HEAD -- . ':(exclude).circleci' | grep "print("
       - run:
           name: Check absence of fixup commits
           command: |
-            ! git log | grep 'fixup!'
+            ! git log --pretty=format:%s | grep 'fixup!'
       - run:
           name: Install gitlint
           command: |
-            pip install --user gitlint
+            pip install --user gitlint requests
       - run:
           name: Lint commit messages added to main
           command: |
@@ -24,7 +49,10 @@ jobs:
   # Check that the CHANGELOG has been updated in the current branch
   check-changelog:
     docker:
-      - image: circleci/buildpack-deps:stretch-scm
+      - image: cimg/base:current
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -37,6 +65,9 @@ jobs:
   lint-changelog:
     docker:
       - image: debian:stretch
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       - checkout
@@ -46,13 +77,19 @@ jobs:
             # Get the longuest line width (ignoring release links)
             test $(cat CHANGELOG.md | grep -Ev "^\[.*\]: https://github.com/openfun" | wc -L) -le 80
 
+  # ---- Docker jobs ----
   # Build the Docker image used in development
   build-docker:
     docker:
-      - image: circleci/buildpack-deps:stretch
+      - image: cimg/base:current
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
+      # Checkout repository sources
       - checkout
+      # Activate docker-in-docker (with layers caching enabled)
       - setup_remote_docker:
           docker_layer_caching: true
       - run:
@@ -142,7 +179,10 @@ jobs:
   # Make a new github release
   release:
     docker:
-      - image: circleci/buildpack-deps:stretch-scm
+      - image: cimg/base:current
+        auth:
+          username: $DOCKER_HUB_USER
+          password: $DOCKER_HUB_PASSWORD
     working_directory: ~/fun
     steps:
       # Add a deployment key to allow write access to the github repository
@@ -150,6 +190,7 @@ jobs:
           fingerprints:
             - "ca:0c:a4:e2:4a:43:ca:9f:ee:15:cf:99:94:4e:78:38"
       - checkout
+      - *docker-login
       - attach_workspace:
           at: ~/fun
       - run:
