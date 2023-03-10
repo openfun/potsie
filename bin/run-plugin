@@ -15,4 +15,4 @@ if [[ $# -ne 2 ]]; then
     exit 2
 fi
 
-DOCKER_USER=${DOCKER_USER} docker-compose run --rm node yarn workspace "${1}" run "${2}"
+DOCKER_USER=${DOCKER_USER} docker compose run --rm node yarn workspace "${1}" run "${2}"

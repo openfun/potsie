@@ -3,7 +3,7 @@
 DOCKER_UID           = $(shell id -u)
 DOCKER_GID           = $(shell id -g)
 DOCKER_USER          = $(DOCKER_UID):$(DOCKER_GID)
-COMPOSE              = DOCKER_USER=$(DOCKER_USER) docker-compose
+COMPOSE              = DOCKER_USER=$(DOCKER_USER) docker compose
 COMPOSE_RUN          = $(COMPOSE) run --rm
 
 # -- Node
@@ -131,7 +131,7 @@ run: ## start the development server
 	@$(WAIT_GRAFANA)
 .PHONY: run
 
-status: ## an alias for "docker-compose ps"
+status: ## an alias for "docker compose ps"
 	@$(COMPOSE) ps
 .PHONY: status
 

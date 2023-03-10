@@ -4,6 +4,6 @@ declare DOCKER_USER
 DOCKER_USER="$(id -u):$(id -g)"
 
 echo -e "curl $*\n" >&2
-DOCKER_USER=${DOCKER_USER} docker-compose run --rm curl "$@"
+DOCKER_USER=${DOCKER_USER} docker compose run --rm curl "$@"
 
 echo -e "\n"

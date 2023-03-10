@@ -7,4 +7,4 @@ DOCKER_USER="$(id -u):$(id -g)"
 # the dashboard directory is mounted in the container working directory, e.g.
 # src/dashboards is mounted in /app/dashboards (with /app as the working
 # directory).
-DOCKER_USER=${DOCKER_USER} docker-compose run --rm app jsonnetfmt "${@//src\//}"
+DOCKER_USER=${DOCKER_USER} docker compose run --rm app jsonnetfmt "${@//src\//}"
