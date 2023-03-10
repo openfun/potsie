@@ -77,8 +77,8 @@ services:
     user: "${DOCKER_USER:-1000}"
     entrypoint: ["ralph"]
     environment:
-      - RALPH_ES_HOSTS=http://elasticsearch:9200
-      - RALPH_ES_INDEX=statements
+      - RALPH_BACKENDS__DATABASE__ES__HOSTS=http://elasticsearch:9200
+      - RALPH_BACKENDS__DATABASE__ES__INDEX=statements
 
   elasticsearch:
     image: elasticsearch:8.2.0

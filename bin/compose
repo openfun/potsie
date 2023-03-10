@@ -5,5 +5,7 @@ declare DOCKER_GID="$(id -g)"
 
 DOCKER_UID=${DOCKER_UID} \
   DOCKER_GID=${DOCKER_GID} \
-  docker-compose \
+  docker compose \
+  -f docker-compose.yml \
+  -f docker-compose-superset.yml \
   "$@"
