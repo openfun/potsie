@@ -5,5 +5,5 @@ declare DOCKER_GID="$(id -g)"
 
 DOCKER_UID=${DOCKER_UID} \
   DOCKER_GID=${DOCKER_GID} \
-  docker-compose \
+  docker compose \
   "$@"

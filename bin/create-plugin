@@ -13,7 +13,7 @@ if [[ $# -ne 1 ]]; then
 fi
 
 CMD="cd packages; npx grafana-toolkit plugin:create $@"
-DOCKER_USER=${DOCKER_USER} docker-compose run --rm node /bin/bash -c "$CMD"
+DOCKER_USER=${DOCKER_USER} docker compose run --rm node /bin/bash -c "$CMD"
 
 PACKAGES=$(dirname $0)/../src/plugins/packages
 cp $PACKAGES/stacked-barchart/tsconfig.json $PACKAGES/$@/tsconfig.json

@@ -11,4 +11,4 @@ DOCKER_USER="$(id -u):$(id -g)"
 # FIXME: once PR https://github.com/google/go-jsonnet/pull/548 is merged,
 # there will be no need for this loop.
 COMMAND="for file_name in ${@//src\//}; do jsonnet-lint \$file_name ; done"
-DOCKER_USER=${DOCKER_USER} docker-compose run --rm app /bin/sh -c "${COMMAND}"
+DOCKER_USER=${DOCKER_USER} docker compose run --rm app /bin/sh -c "${COMMAND}"
