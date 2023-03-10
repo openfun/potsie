@@ -102,7 +102,7 @@ jobs:
   # Compile Jsonnet sources
   compile:
     machine:
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2004:2023.02.1
       docker_layer_caching: true
     working_directory: ~/fun
     steps:
@@ -121,7 +121,7 @@ jobs:
   # Lint Jsonnet sources
   lint:
     machine:
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2004:2023.02.1
       docker_layer_caching: true
     working_directory: ~/fun
     steps:
@@ -140,7 +140,7 @@ jobs:
   # Build and test plugins
   plugins:
     machine:
-      image: ubuntu-2004:202104-01
+      image: ubuntu-2004:2023.02.1
       docker_layer_caching: true
     working_directory: ~/fun
     steps:
