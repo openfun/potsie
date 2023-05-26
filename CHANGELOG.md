@@ -12,6 +12,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 - Upgrade `Grafana` to 9.5.2
 
+### Fixed
+
+- Viewers computation was counting multiple times same viewers
+
 ## [0.6.0] - 2022-05-31
 
 ### Added
