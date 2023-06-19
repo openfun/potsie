@@ -9,7 +9,7 @@ services:
       - ./fixtures/postgresql/marsha.sql:/docker-entrypoint-initdb.d/init.sql
 
   grafana:
-    image: grafana/grafana:9.5.2
+    image: grafana/grafana:9.5.3
     ports:
       - 3000:3000
     user: "${DOCKER_USER:-1000}"
