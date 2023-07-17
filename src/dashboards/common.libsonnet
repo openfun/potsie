@@ -8,9 +8,6 @@
   },
   fields: {
     actor_account_name: 'actor.account.name.keyword',
-    course: 'object.definition.extensions.http://adlnet.gov/expapi/activities/course.keyword',
-    school: 'object.definition.extensions.https://w3id.org/xapi/acrossx/extensions/school.keyword',
-    session: 'object.definition.extensions.http://adlnet.gov/expapi/activities/module.keyword',
     video_id: 'object.id.keyword',
     subtitle_enabled: 'context.extensions.https://w3id.org/xapi/video/extensions/cc-subtitle-enabled',
     full_screen: 'context.extensions.https://w3id.org/xapi/video/extensions/full-screen',

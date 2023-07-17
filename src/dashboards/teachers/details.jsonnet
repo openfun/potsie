@@ -18,9 +18,6 @@ dashboard.new(
 )
 .addLink(teachers_common.link.teacher)
 .addTemplate(teachers_common.templates.edx_course_key)
-.addTemplate(teachers_common.templates.school)
-.addTemplate(teachers_common.templates.course)
-.addTemplate(teachers_common.templates.session)
 .addTemplate(teachers_common.templates.video)
 .addPanel(
   row.new(title='Views metrics', collapse=false),
@@ -237,7 +234,7 @@ dashboard.new(
       A view is counted when the user has clicked the play button in the interface
       in the first %(view_count_threshold)s seconds of the video.
 
-      A complete view is counted when the user has viewed the video 
+      A complete view is counted when the user has viewed the video
       at least up to the completion threshold.
 
       A download is counted when the user downloads the video files from Marsha.
