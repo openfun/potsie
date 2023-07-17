@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Removed
+
+- Support for legacy course key building from object definition extensions [BC]
+
 ## [0.8.0] - 2023-06-19
 
 ### Changed

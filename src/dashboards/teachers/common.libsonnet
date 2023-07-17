@@ -37,9 +37,8 @@ local common = import '../common.libsonnet';
     course_title: 'SELECT `title` FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
     course_start_date: 'SELECT DATE_FORMAT(start_date, "%d/%m/%Y") FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
     course_end_date: 'SELECT DATE_FORMAT(end_date, "%d/%m/%Y") FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
-    course_query: '%(course_key)s OR (%(school_course_session)s)' % {
+    course_query: '%(course_key)s' % {
       course_key: $.queries.course_key,
-      school_course_session: $.queries.school_course_session,
     },
     course_videos: 'object.id.keyword:${COURSE_VIDEOS_IDS_WITH_UUID:lucene}',
     downloads: '%(video_query)s AND verb.id:"%(verb_downloaded)s"' % {
@@ -47,11 +46,6 @@ local common = import '../common.libsonnet';
       verb_downloaded: common.verb_ids.downloaded,
     },
     edx_course_key: 'SELECT `key` FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
-    school_course_session: '%(school)s:${SCHOOL:doublequote} AND %(course)s:${COURSE:doublequote} AND %(session)s:${SESSION:doublequote}' % {
-      course: common.utils.single_escape_string(common.fields.course),
-      school: common.utils.single_escape_string(common.fields.school),
-      session: common.utils.single_escape_string(common.fields.session),
-    },
     video_id: 'object.id.keyword:${VIDEO:doublequote}',
     views: '%(video_query)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
       video_query: $.queries.video_id,
@@ -74,36 +68,6 @@ local common = import '../common.libsonnet';
       },
       refresh='time',
       sort=1,
-    ),
-    school: template.new(
-      name='SCHOOL',
-      current='all',
-      label='School',
-      datasource=common.datasources.edx_app,
-      query=$.queries.edx_course_key,
-      regex='/course-v1:(.*)\\+\\d+\\+.*/',
-      hide='variable',
-      refresh='time'
-    ),
-    course: template.new(
-      name='COURSE',
-      current='all',
-      label='Course',
-      datasource=common.datasources.edx_app,
-      query=$.queries.edx_course_key,
-      regex='/course-v1:.*\\+(\\d+)\\+.*/',
-      hide='variable',
-      refresh='time'
-    ),
-    session: template.new(
-      name='SESSION',
-      current='all',
-      label='Session',
-      datasource=common.datasources.edx_app,
-      query=$.queries.edx_course_key,
-      regex='/course-v1:.*\\+\\d+\\+(.*)/',
-      hide='variable',
-      refresh='time'
     ),
     title: template.new(
       name='TITLE',
@@ -145,10 +109,9 @@ local common = import '../common.libsonnet';
       name='VIDEO',
       label='Video',
       datasource=common.datasources.lrs,
-      query='{"find": "terms", "field": "%(video_id)s", "query": "%(course_key)s OR (%(school_course_session)s)"}' % {
+      query='{"find": "terms", "field": "%(video_id)s", "query": "%(course_key)s"}' % {
         video_id: common.fields.video_id,
         course_key: $.queries.course_key,
-        school_course_session: std.strReplace($.queries.school_course_session, '\\', '\\\\'),
       },
       refresh='time'
     ),
@@ -158,10 +121,9 @@ local common = import '../common.libsonnet';
       hide='variable',
       label='Course videos identifiers',
       datasource=common.datasources.lrs,
-      query='{"find": "terms", "field": "%(video_id)s", "query": "%(course_key)s OR (%(school_course_session)s)"}' % {
+      query='{"find": "terms", "field": "%(video_id)s", "query": "%(course_key)s"}' % {
         video_id: common.fields.video_id,
         course_key: $.queries.course_key,
-        school_course_session: std.strReplace($.queries.school_course_session, '\\', '\\\\'),
       },
       multi='true',
       includeAll='true',
@@ -174,10 +136,9 @@ local common = import '../common.libsonnet';
       current='all',
       label='Video',
       datasource=common.datasources.lrs,
-      query='{"find": "terms", "field": "%(video_id)s", "query": "%(course_key)s OR (%(school_course_session)s)"}' % {
+      query='{"find": "terms", "field": "%(video_id)s", "query": "%(course_key)s"}' % {
         video_id: common.fields.video_id,
         course_key: $.queries.course_key,
-        school_course_session: std.strReplace($.queries.school_course_session, '\\', '\\\\'),
       },
       multi='true',
       includeAll='true',

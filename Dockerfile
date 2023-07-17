@@ -1,5 +1,5 @@
 # Install required libraries
-FROM golang:alpine AS builder
+FROM golang:alpine3.18 AS builder
 
 # Update installed packages
 RUN apk -U upgrade
