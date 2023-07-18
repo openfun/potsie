@@ -5,6 +5,7 @@ DOCKER_GID           = $(shell id -g)
 DOCKER_USER          = $(DOCKER_UID):$(DOCKER_GID)
 COMPOSE              = DOCKER_USER=$(DOCKER_USER) docker compose
 COMPOSE_RUN          = $(COMPOSE) run --rm
+ES_INDEX             = statements-fixtures
 
 # -- Node
 COMPOSE_RUN_NODE     = $(COMPOSE_RUN) node
@@ -83,10 +84,11 @@ fixtures: \
 fixtures: ## Load test data (for development)
 	@echo "Wait for databases to be up..."
 	@$(WAIT_ES)
+	$(COMPOSE_RUN) elasticsearch /usr/local/bin/create_es_index.sh $(ES_INDEX)
 	@$(WAIT_MYSQL)
 	zcat ./fixtures/elasticsearch/lrs.json.gz | \
 	  $(COMPOSE_RUN) patch_statements_date | \
-	  $(COMPOSE_RUN) -T ralph push -b es --es-index statements-fixtures  && \
+	  $(COMPOSE_RUN) -T ralph push -b es --es-index $(ES_INDEX) && \
 	  $(COMPOSE_RUN) users-permissions sh /scripts/users-permissions.sh
 .PHONY: fixtures
 

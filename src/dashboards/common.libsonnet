@@ -8,7 +8,7 @@
   },
   fields: {
     actor_account_name: 'actor.account.name.keyword',
-    video_id: 'object.id.keyword',
+    video_id: 'object.id',
     subtitle_enabled: 'context.extensions.https://w3id.org/xapi/video/extensions/cc-subtitle-enabled',
     full_screen: 'context.extensions.https://w3id.org/xapi/video/extensions/full-screen',
     speed: 'context.extensions.https://w3id.org/xapi/video/extensions/speed.keyword',
@@ -61,5 +61,6 @@
     initialized: 'http://adlnet.gov/expapi/verbs/initialized',
     played: 'https://w3id.org/xapi/video/verbs/played',
     downloaded: 'http://id.tincanapi.com/verb/downloaded',
+    interacted: 'http://adlnet.gov/expapi/verbs/interacted',
   },
 }

@@ -387,7 +387,7 @@ dashboard.new(
       {
         id: 'seriesToColumns',
         options: {
-          byField: 'object.id.keyword',
+          byField: 'object.id',
         },
       },
     ],
@@ -407,7 +407,7 @@ dashboard.new(
         {
           matcher: {
             id: 'byName',
-            options: 'object.id.keyword',
+            options: 'object.id',
           },
           properties: [
             {
@@ -547,7 +547,7 @@ dashboard.new(
         ],
         query: '',
         rawQuery: true,
-        rawSql: "SELECT 'uuid://' || id AS \"object.id.keyword\",title FROM video where id IN (${COURSE_VIDEOS_IDS:sqlstring})",
+        rawSql: "SELECT 'uuid://' || id AS \"object.id\",title FROM video where id IN (${COURSE_VIDEOS_IDS:sqlstring})",
         refId: 'B',
         select: [
           [

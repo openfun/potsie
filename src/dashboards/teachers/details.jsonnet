@@ -458,8 +458,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_query)s AND verb.id:"interacted" AND %(subtitle_enabled)s:true' % {
-        video_query: teachers_common.queries.video_id,
+      query='%(interacted_query)s AND %(subtitle_enabled)s:true' % {
+        interacted_query: teachers_common.queries.video_interacted,
         subtitle_enabled: common.utils.single_escape_string(common.fields.subtitle_enabled),
       },
       metrics=[common.metrics.count],
@@ -511,8 +511,8 @@ dashboard.new(
     targets: [
       {
         datasource: common.datasources.lrs,
-        query: '%(video_query)s AND verb.id:"interacted"' % {
-          video_query: teachers_common.queries.video_id,
+        query: '%(interacted_query)s' % {
+          interacted_query: teachers_common.queries.video_interacted,
         },
         metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
         bucketAggs: [
@@ -549,8 +549,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_query)s AND verb.id:"interacted" AND %(full_screen)s:true' % {
-        video_query: teachers_common.queries.video_id,
+      query='%(interacted_query)s AND %(full_screen)s:true' % {
+        interacted_query: teachers_common.queries.video_interacted,
         full_screen: common.utils.single_escape_string(common.fields.full_screen),
       },
       metrics=[common.metrics.count],
@@ -603,8 +603,8 @@ dashboard.new(
     targets: [
       {
         datasource: common.datasources.lrs,
-        query: '%(video_query)s AND verb.id:"interacted"' % {
-          video_query: teachers_common.queries.video_id,
+        query: '%(video_interacted)s' % {
+          video_interacted: teachers_common.queries.video_interacted,
         },
         metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
         bucketAggs: [
@@ -678,8 +678,8 @@ dashboard.new(
     targets: [
       {
         datasource: common.datasources.lrs,
-        query: '%(video_query)s AND verb.id:"interacted"' % {
-          video_query: teachers_common.queries.video_id,
+        query: '%(interacted_query)s' % {
+          interacted_query: teachers_common.queries.video_interacted,
         },
         metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
         bucketAggs: [
@@ -799,8 +799,8 @@ dashboard.new(
     targets: [
       {
         datasource: common.datasources.lrs,
-        query: '%(video_query)s AND verb.id:"interacted"' % {
-          video_query: teachers_common.queries.video_id,
+        query: '%(interacted_query)s' % {
+          interacted_query: teachers_common.queries.video_interacted,
         },
         metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
         bucketAggs: [
