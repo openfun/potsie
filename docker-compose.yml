@@ -88,6 +88,8 @@ services:
       xpack.security.enabled: "false"
     ports:
       - "9200:9200"
+    volumes:
+      - ./scripts/create_es_index.sh:/usr/local/bin/create_es_index.sh
 
   edx_mysql:
     image: mariadb:10.3.32

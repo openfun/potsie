@@ -8,6 +8,11 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Changed
+
+- Moved `object.id` and `context.contextActivities.parent.id` to `keyword`
+  mapping type.
+
 ### Removed
 
 - Support for legacy course key building from object definition extensions [BC]

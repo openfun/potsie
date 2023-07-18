@@ -32,7 +32,7 @@ local common = import '../common.libsonnet';
       video_query: $.queries.video_id,
       verb_completed: common.verb_ids.completed,
     },
-    course_key: 'context.contextActivities.parent.id.keyword:${EDX_COURSE_KEY:doublequote}',
+    course_key: 'context.contextActivities.parent.id:${EDX_COURSE_KEY:doublequote}',
     course_enrollments: 'SELECT DISTINCT COUNT(`user_id`) FROM `student_courseenrollment` WHERE (`is_active`=1 AND `course_id`="${EDX_COURSE_KEY}")',
     course_title: 'SELECT `title` FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
     course_start_date: 'SELECT DATE_FORMAT(start_date, "%d/%m/%Y") FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
@@ -40,13 +40,17 @@ local common = import '../common.libsonnet';
     course_query: '%(course_key)s' % {
       course_key: $.queries.course_key,
     },
-    course_videos: 'object.id.keyword:${COURSE_VIDEOS_IDS_WITH_UUID:lucene}',
+    course_videos: 'object.id:${COURSE_VIDEOS_IDS_WITH_UUID:lucene}',
     downloads: '%(video_query)s AND verb.id:"%(verb_downloaded)s"' % {
       video_query: $.queries.video_id,
       verb_downloaded: common.verb_ids.downloaded,
     },
     edx_course_key: 'SELECT `key` FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
-    video_id: 'object.id.keyword:${VIDEO:doublequote}',
+    video_interacted: '%(video_query)s AND verb.id:"%(verb_interacted)s"' % {
+      video_query: $.queries.video_id,
+      verb_interacted: common.verb_ids.interacted,
+    },
+    video_id: 'object.id:${VIDEO:doublequote}',
     views: '%(video_query)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
       video_query: $.queries.video_id,
       verb_played: common.verb_ids.played,
