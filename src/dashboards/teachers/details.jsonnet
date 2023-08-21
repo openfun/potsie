@@ -79,7 +79,7 @@ dashboard.new(
       bucketAggs=[
         {
           id: 'name',
-          field: common.fields.actor_account_name,
+          field: common.fields.parent_id,
           settings: {
             order: 'desc',
             orderBy: '_count',
@@ -145,7 +145,7 @@ dashboard.new(
       bucketAggs=[
         {
           id: '5',
-          field: common.fields.actor_account_name,
+          field: common.fields.parent_id,
           settings: {
             min_doc_count: '1',
             size: '0',

@@ -216,9 +216,9 @@ dashboard.new(
     |||,
     datasource=common.datasources.lrs,
     graphMode='none',
-    reducerFunction='count',
+    reducerFunction='sum',
     unit='none',
-    fields='/^actor\\.account\\.name\\.keyword$/'
+    fields='/^Unique Count$/'
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
@@ -228,11 +228,11 @@ dashboard.new(
         time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
         view_count_threshold: teachers_common.constants.view_count_threshold,
       },
-      metrics=[common.metrics.count],
+      metrics=[common.metrics.cardinality(common.fields.actor_account_name)],
       bucketAggs=[
         {
           id: 'name',
-          field: common.fields.actor_account_name,
+          field: common.fields.parent_id,
           type: 'terms',
           settings: {
             order: 'desc',
@@ -316,9 +316,9 @@ dashboard.new(
     |||,
     datasource=common.datasources.lrs,
     graphMode='none',
-    reducerFunction='count',
+    reducerFunction='sum',
     unit='none',
-    fields='/^actor\\.account\\.name\\.keyword$/'
+    fields='/^Unique Count$/'
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
@@ -326,11 +326,11 @@ dashboard.new(
         course_videos: teachers_common.queries.course_videos,
         verb_completed: common.verb_ids.completed,
       },
-      metrics=[common.metrics.count],
+      metrics=[common.metrics.cardinality(common.fields.actor_account_name)],
       bucketAggs=[
         {
           id: '5',
-          field: common.fields.actor_account_name,
+          field: common.fields.parent_id,
           type: 'terms',
           settings: {
             size: '0',

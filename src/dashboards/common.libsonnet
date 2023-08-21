@@ -15,6 +15,7 @@
     subtitle_language: 'context.extensions.https://w3id.org/xapi/video/extensions/cc-subtitle-lang.keyword',
     quality: 'context.extensions.https://w3id.org/xapi/video/extensions/quality',
     volume: 'context.extensions.https://w3id.org/xapi/video/extensions/volume',
+    parent_id: 'context.contextActivities.parent.id.keyword'
   },
   metrics: {
     count: { id: '1', type: 'count' },
