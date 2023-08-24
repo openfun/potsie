@@ -7,6 +7,8 @@ local graphPanel = grafana.graphPanel;
 local row = grafana.row;
 local statPanel = grafana.statPanel;
 local teachers_common = import 'common.libsonnet';
+local text = grafana.text;
+local utils = import '../utils.libsonnet';
 local common = import '../common.libsonnet';
 
 dashboard.new(
@@ -18,10 +20,129 @@ dashboard.new(
 )
 .addLink(teachers_common.link.teacher)
 .addTemplate(teachers_common.templates.edx_course_key)
-.addTemplate(teachers_common.templates.video)
+.addTemplate(teachers_common.templates.video_iri)
+.addTemplate(teachers_common.templates.video_id)
+.addTemplate(teachers_common.templates.video_title)
 .addPanel(
-  row.new(title='Views metrics', collapse=false),
+  row.new(title='Video information', collapse=false),
   gridPos={ x: 0, y: 0, w: 24, h: 1 }
+)
+.addPanel(
+  text.new(
+    title='Title',
+    content=|||
+      # ${VIDEO_TITLE}
+    |||
+  ),
+  gridPos={ x: 0, y: 1, w: 12, h: 4.5 }
+)
+.addPanel(
+  statPanel.new(
+    title='Duration',
+    description=|||
+      Duration of the video (in seconds).
+    |||,
+    datasource=common.datasources.lrs,
+    graphMode='none',
+    reducerFunction='max',
+    unit='none',
+    fields='/^Max context\\.extensions.https://w3id.org/xapi/video/extensions/length$/'
+  ).addTarget(
+    elasticsearch.target(
+      datasource=common.datasources.lrs,
+      query='%(video_iri)s AND verb.id:"%(verb_initialized)s"' % {
+        video_iri: teachers_common.queries.video_iri,
+        verb_initialized: common.fields.verb.id.initialized,
+      },
+      metrics=[utils.metrics.max(common.fields.context.extensions.length)],
+      bucketAggs=[utils.aggregations.date_histogram()],
+      timeField='@timestamp'
+    )
+  ),
+  gridPos={ x: 12, y: 1, w: 6, h: 4.5 },
+)
+.addPanel(
+  statPanel.new(
+    title='Completion threshold',
+    description=|||
+      Ratio of the video that needs to be seen to consider the video as completed.
+    |||,
+    datasource=common.datasources.lrs,
+    graphMode='none',
+    reducerFunction='max',
+    unit='none',
+    fields='/^Max context\\.extensions.https://w3id.org/xapi/video/extensions/completion\\-threshold$/'
+  ).addTarget(
+    elasticsearch.target(
+      datasource=common.datasources.lrs,
+      query='%(video_iri)s AND verb.id:"%(verb_initialized)s"' % {
+        video_iri: teachers_common.queries.video_iri,
+        verb_initialized: common.fields.verb.id.initialized,
+      },
+      metrics=[utils.metrics.max(common.fields.context.extensions.completion_threshold)],
+      bucketAggs=[utils.aggregations.date_histogram()],
+      timeField='@timestamp'
+    )
+  ),
+  gridPos={ x: 18, y: 1, w: 6, h: 4.5 },
+)
+.addPanel(
+  row.new(title='Views statistics', collapse=false),
+  gridPos={ x: 0, y: 5.5, w: 24, h: 1 }
+)
+.addPanel(
+  graphPanel.new(
+    title='Daily statistics',
+    description=|||
+      Daily views, complete views and downloads of the video.
+
+      A view is counted when the user has clicked the play button in the interface
+      in the first %(view_count_threshold)s seconds of the video.
+
+      A complete view is counted when the user has viewed the video
+      at least up to the completion threshold.
+
+      A download is counted when the user downloads the video files from Marsha.
+    ||| % { view_count_threshold: teachers_common.constants.view_count_threshold },
+    datasource=common.datasources.lrs,
+  ).addTarget(
+    elasticsearch.target(
+      alias='Views',
+      datasource=common.datasources.lrs,
+      query='%(video_iri)s AND %(views)s' % {
+        video_iri: teachers_common.queries.video_iri,
+        views: teachers_common.queries.views,
+      },
+      metrics=[utils.metrics.count],
+      bucketAggs=[utils.aggregations.date_histogram(min_doc_count=0)],
+      timeField='@timestamp'
+    )
+  ).addTarget(
+    elasticsearch.target(
+      alias='Complete views',
+      datasource=common.datasources.lrs,
+      query='%(video_iri)s AND %(complete_views)s' % {
+        video_iri: teachers_common.queries.video_iri,
+        complete_views: teachers_common.queries.complete_views,
+      },
+      metrics=[utils.metrics.count],
+      bucketAggs=[utils.aggregations.date_histogram(min_doc_count=0)],
+      timeField='@timestamp'
+    )
+  ).addTarget(
+    elasticsearch.target(
+      alias='Downloads',
+      datasource=common.datasources.lrs,
+      query='%(video_iri)s AND %(downloads)s' % {
+        video_iri: teachers_common.queries.video_iri,
+        downloads: teachers_common.queries.downloads,
+      },
+      metrics=[utils.metrics.count],
+      bucketAggs=[utils.aggregations.date_histogram(min_doc_count=0)],
+      timeField='@timestamp'
+    )
+  ),
+  gridPos={ x: 0, y: 6.5, w: 12, h: 9 }
 )
 .addPanel(
   statPanel.new(
@@ -50,7 +171,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 0, y: 1, w: 4.8, h: 3 }
+  gridPos={ x: 12, y: 6.5, w: 6, h: 3 }
 )
 .addPanel(
   statPanel.new(
@@ -66,12 +187,15 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query=teachers_common.queries.views,
-      metrics=[common.metrics.cardinality(common.fields.actor_account_name)],
+      query='%(video_iri)s AND %(views)s' % {
+        video_iri: teachers_common.queries.video_iri,
+        views: teachers_common.queries.views,
+      },
+      metrics=[utils.metrics.cardinality(common.fields.actor.account.name)],
       bucketAggs=[
         {
           id: 'name',
-          field: common.fields.parent_id,
+          field: common.fields.context.contextActivities.parent.id,
           settings: {
             order: 'desc',
             orderBy: '_count',
@@ -84,7 +208,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 4.8, y: 1, w: 4.8, h: 3 }
+  gridPos={ x: 18, y: 6.5, w: 6, h: 3 }
 )
 .addPanel(
   statPanel.new(
@@ -108,7 +232,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 0, y: 3, w: 4.8, h: 3 },
+  gridPos={ x: 12, y: 9.5, w: 6, h: 3 },
 )
 .addPanel(
   statPanel.new(
@@ -124,12 +248,15 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query=teachers_common.queries.complete_views,
-      metrics=[common.metrics.cardinality(common.fields.actor_account_name)],
+      query='%(video_iri)s AND %(complete_views)s' % {
+        video_iri: teachers_common.queries.video_iri,
+        complete_views: teachers_common.queries.complete_views,
+      },
+      metrics=[utils.metrics.cardinality(common.fields.actor.account.name)],
       bucketAggs=[
         {
           id: '5',
-          field: common.fields.parent_id,
+          field: common.fields.context.contextActivities.parent.id,
           settings: {
             min_doc_count: '1',
             size: '0',
@@ -142,7 +269,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 4.8, y: 3, w: 4.8, h: 3 },
+  gridPos={ x: 18, y: 9.5, w: 6, h: 3 },
 )
 .addPanel(
   statPanel.new(
@@ -166,122 +293,48 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 0, y: 5, w: 4.8, h: 3 }
+  gridPos={ x: 12, y: 12.5, w: 6, h: 3 }
 )
 .addPanel(
   statPanel.new(
-    title='Completion threshold',
+    title='Downloaders',
     description=|||
-      Ratio of the video that needs to be seen to consider the video as completed.
+      Number of users that have downloaded the video.
     |||,
     datasource=common.datasources.lrs,
     graphMode='none',
-    reducerFunction='max',
+    reducerFunction='sum',
     unit='none',
-    fields='/^Max context\\.extensions.https://w3id.org/xapi/video/extensions/completion\\-threshold$/'
+    fields='/^Unique Count$/'
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_query)s AND verb.id:"%(verb_initialized)s"' % {
-        video_query: teachers_common.queries.video_id,
-        verb_initialized: common.verb_ids.initialized,
+      query='%(video_iri)s AND %(downloads)s' % {
+        video_iri: teachers_common.queries.video_iri,
+        downloads: teachers_common.queries.downloads,
       },
-      metrics=[common.metrics.max(teachers_common.fields.context_extensions_completion_threshold)],
+      metrics=[utils.metrics.cardinality(common.fields.actor.account.name)],
       bucketAggs=[
         {
-          id: '2',
-          type: 'date_histogram',
+          id: '5',
+          field: common.fields.context.contextActivities.parent.id,
           settings: {
-            interval: 'auto',
+            min_doc_count: '1',
+            size: '0',
+            order: 'desc',
+            orderBy: '_count',
           },
+          type: 'terms',
         },
       ],
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 4.8, y: 5, w: 4.8, h: 3 },
-)
-.addPanel(
-  graphPanel.new(
-    title='Daily statistics',
-    description=|||
-      Daily views, complete views and downloads of the video.
-
-      A view is counted when the user has clicked the play button in the interface
-      in the first %(view_count_threshold)s seconds of the video.
-
-      A complete view is counted when the user has viewed the video
-      at least up to the completion threshold.
-
-      A download is counted when the user downloads the video files from Marsha.
-    ||| % { view_count_threshold: teachers_common.constants.view_count_threshold },
-    datasource=common.datasources.lrs,
-  ).addTarget(
-    elasticsearch.target(
-      alias='Views',
-      datasource=common.datasources.lrs,
-      query=teachers_common.queries.views,
-      metrics=[common.metrics.count],
-      bucketAggs=[
-        {
-          id: 'date',
-          field: '@timestamp',
-          type: 'date_histogram',
-          settings: {
-            interval: '1d',
-            min_doc_count: '0',
-            trimEdges: '0',
-          },
-        },
-      ],
-      timeField='@timestamp'
-    )
-  ).addTarget(
-    elasticsearch.target(
-      alias='Complete views',
-      datasource=common.datasources.lrs,
-      query=teachers_common.queries.complete_views,
-      metrics=[common.metrics.count],
-      bucketAggs=[
-        {
-          id: 'date',
-          field: '@timestamp',
-          type: 'date_histogram',
-          settings: {
-            interval: '1d',
-            min_doc_count: '0',
-            trimEdges: '0',
-          },
-        },
-      ],
-      timeField='@timestamp'
-    )
-  ).addTarget(
-    elasticsearch.target(
-      alias='Downloads',
-      datasource=common.datasources.lrs,
-      query=teachers_common.queries.downloads,
-      metrics=[common.metrics.count],
-      bucketAggs=[
-        {
-          id: 'date',
-          field: '@timestamp',
-          type: 'date_histogram',
-          settings: {
-            interval: '1d',
-            min_doc_count: '0',
-            trimEdges: '0',
-          },
-        },
-      ],
-      timeField='@timestamp'
-    )
-  ),
-  gridPos={ x: 9.6, y: 1, w: 14.4, h: 9 }
+  gridPos={ x: 18, y: 12.5, w: 6, h: 3 },
 )
 .addPanel(
   row.new(title='Event distributions', collapse=false),
-  gridPos={ x: 0, y: 7, w: 24, h: 1 }
+  gridPos={ x: 0, y: 15.5, w: 24, h: 1 }
 )
 .addPanel(
   {
@@ -330,7 +383,7 @@ dashboard.new(
     ],
     type: 'potsie-stackedbarchart-panel',
   },
-  gridPos={ x: 0, y: 8, w: 24, h: 9 }
+  gridPos={ x: 0, y: 16.5, w: 24, h: 9 }
 )
 .addPanel(
   graphPanel.new(
@@ -360,7 +413,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 0, y: 17, w: 12, h: 9 }
+  gridPos={ x: 0, y: 24.5, w: 12, h: 9 }
 )
 .addPanel(
   graphPanel.new(
@@ -394,11 +447,11 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 12, y: 17, w: 12, h: 9 }
+  gridPos={ x: 12, y: 24.5, w: 12, h: 9 }
 )
 .addPanel(
-  row.new(title='Interaction activities', collapse=false),
-  gridPos={ x: 0, y: 26, w: 24, h: 1 },
+  row.new(title='Video player interactions', collapse=false),
+  gridPos={ x: 0, y: 33.5, w: 24, h: 1 },
 )
 .addPanel(
   statPanel.new(
@@ -436,7 +489,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 0, y: 26, w: 4, h: 6 }
+  gridPos={ x: 0, y: 34.5, w: 4, h: 6 }
 ).addPanel(
   {
     type: 'barchart',
@@ -491,7 +544,7 @@ dashboard.new(
     ],
     datasource: common.datasources.lrs,
   },
-  gridPos={ x: 4, y: 26, w: 4, h: 6 }
+  gridPos={ x: 4, y: 34.5, w: 4, h: 6 }
 )
 .addPanel(
   statPanel.new(
@@ -529,7 +582,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 8, y: 26, w: 4, h: 6 }
+  gridPos={ x: 8, y: 34.5, w: 4, h: 6 }
 ).addPanel(
   {
     type: 'barchart',
@@ -605,7 +658,7 @@ dashboard.new(
       },
     ],
   },
-  gridPos={ x: 12, y: 26, w: 4, h: 6 }
+  gridPos={ x: 12, y: 34.5, w: 4, h: 6 }
 ).addPanel(
   {
     type: 'barchart',
@@ -692,7 +745,7 @@ dashboard.new(
       },
     ],
   },
-  gridPos={ x: 16, y: 26, w: 4, h: 6 }
+  gridPos={ x: 16, y: 34.5, w: 4, h: 6 }
 ).addPanel(
   {
     type: 'barchart',
@@ -814,5 +867,5 @@ dashboard.new(
       },
     ],
   },
-  gridPos={ x: 20, y: 26, w: 4, h: 6 }
+  gridPos={ x: 20, y: 34.5, w: 4, h: 6 }
 )

@@ -4,12 +4,13 @@ local grafana = import 'grafonnet/grafana.libsonnet';
 local dashboard = grafana.dashboard;
 local elasticsearch = grafana.elasticsearch;
 local graphPanel = grafana.graphPanel;
+local row = grafana.row;
 local statPanel = grafana.statPanel;
 local sql = grafana.sql;
 local teachers_common = import 'common.libsonnet';
 local text = grafana.text;
 local common = import '../common.libsonnet';
-
+local utils = import '../utils.libsonnet';
 
 dashboard.new(
   'Course videos overview',
@@ -26,23 +27,47 @@ dashboard.new(
 .addTemplate(teachers_common.templates.course_videos_ids)
 .addTemplate(teachers_common.templates.course_videos_iris)
 .addPanel(
-  text.new(
-    title='Course title',
-    content=|||
-      # ${TITLE}
-    |||
-  ),
-  gridPos={ x: 0, y: 0, w: 12, h: 4.5 }
+  row.new(title='Course information', collapse=false),
+  gridPos={ x: 0, y: 0, w: 24, h: 1 }
 )
 .addPanel(
   text.new(
-    title='Course dates',
+    title='Title',
+    content=|||
+      # ${COURSE_TITLE}
+    |||
+  ),
+  gridPos={ x: 0, y: 1, w: 12, h: 4.5 }
+)
+.addPanel(
+  text.new(
+    title='Session dates',
     content=|||
       ## Started: ${START_DATE}
       ## Ended: ${END_DATE}
     |||
   ),
-  gridPos={ x: 0, y: 3, w: 4, h: 4.5 }
+  gridPos={ x: 12, y: 1, w: 4, h: 4.5 }
+)
+.addPanel(
+  statPanel.new(
+    title='Enrollments',
+    description=|||
+      Total number of enrolled users for the course session.
+
+      Enrolled users comprise learners and instructors.
+    |||,
+    datasource=common.datasources.edx_app,
+    graphMode='none',
+    reducerFunction='sum',
+  ).addTarget(
+    sql.target(
+      datasource=common.datasources.edx_app,
+      rawSql=teachers_common.queries.course_enrollments,
+      format='table'
+    )
+  ),
+  gridPos={ x: 16, y: 1, w: 4, h: 4.5 }
 )
 .addPanel(
   statPanel.new(
@@ -72,25 +97,11 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 4, y: 3, w: 4, h: 4.5 }
+  gridPos={ x: 20, y: 1, w: 4, h: 4.5 }
 )
 .addPanel(
-  statPanel.new(
-    title='Enrollments',
-    description=|||
-      Total number of enrolled students.
-    |||,
-    datasource=common.datasources.edx_app,
-    graphMode='none',
-    reducerFunction='sum',
-  ).addTarget(
-    sql.target(
-      datasource=common.datasources.edx_app,
-      rawSql=teachers_common.queries.course_enrollments,
-      format='table'
-    )
-  ),
-  gridPos={ x: 8, y: 3, w: 4, h: 4.5 }
+  row.new(title='Views statistics', collapse=false),
+  gridPos={ x: 0, y: 5.5, w: 24, h: 1 }
 )
 .addPanel(
   graphPanel.new(
@@ -144,7 +155,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 0, y: 9, w: 24, h: 12 }
+  gridPos={ x: 0, y: 6.5, w: 12, h: 12 }
 )
 .addPanel(
   statPanel.new(
@@ -172,13 +183,13 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 12, y: 0, w: 4, h: 4.5 }
+  gridPos={ x: 12, y: 6.5, w: 4, h: 4 }
 )
 .addPanel(
   statPanel.new(
     title='Viewers',
     description=|||
-      Number of enrolled users that played at least one video.
+      Number of users that played at least one video.
     |||,
     datasource=common.datasources.lrs,
     graphMode='none',
@@ -208,7 +219,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 16, y: 0, w: 4, h: 4.5 }
+  gridPos={ x: 16, y: 6.5, w: 4, h: 4 }
 )
 .addPanel(
   statPanel.new(
@@ -243,7 +254,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 20, y: 0, w: 4, h: 4.5 }
+  gridPos={ x: 20, y: 6.5, w: 4, h: 4 }
 )
 .addPanel(
   statPanel.new(
@@ -268,7 +279,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 12, y: 4.5, w: 4, h: 4.5 }
+  gridPos={ x: 12, y: 10.5, w: 4, h: 4 }
 )
 .addPanel(
   statPanel.new(
@@ -304,7 +315,7 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 16, y: 4.5, w: 4, h: 4.5 }
+  gridPos={ x: 16, y: 10.5, w: 4, h: 4 }
 )
 .addPanel(
   statPanel.new(
@@ -319,9 +330,9 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND verb.id:"%(verb_completed)s"' % {
+      query='%(course_videos)s AND %(complete_views)s' % {
         course_videos: teachers_common.queries.course_videos,
-        verb_completed: common.verb_ids.completed,
+        complete_views: teachers_common.queries.complete_views,
       },
       metrics=[utils.metrics.count],
       bucketAggs=[
@@ -339,7 +350,105 @@ dashboard.new(
       timeField='@timestamp'
     )
   ),
-  gridPos={ x: 20, y: 4.5, w: 4, h: 4.5 }
+  gridPos={ x: 20, y: 10.5, w: 4, h: 4 }
+)
+.addPanel(
+  statPanel.new(
+    title='Downloads',
+    description=|||
+      Total number of downloads of selected course session videos.
+    |||,
+    datasource=common.datasources.lrs,
+    graphMode='none',
+    reducerFunction='sum',
+  ).addTarget(
+    elasticsearch.target(
+      datasource=common.datasources.lrs,
+      query='%(course_videos)s AND %(downloads)s' % {
+        course_videos: teachers_common.queries.course_videos,
+        downloads: teachers_common.queries.downloads,
+      },
+      metrics=[utils.metrics.count],
+      bucketAggs=[utils.aggregations.date_histogram()],
+      timeField='@timestamp'
+    )
+  ),
+  gridPos={ x: 12, y: 14.5, w: 4, h: 4 }
+)
+.addPanel(
+  statPanel.new(
+    title='Downloaders',
+    description=|||
+      Number of users that have downloaded at least one video.
+    |||,
+    datasource=common.datasources.lrs,
+    graphMode='none',
+    reducerFunction='sum',
+    unit='none',
+    fields='/^Unique Count$/'
+  ).addTarget(
+    elasticsearch.target(
+      datasource=common.datasources.lrs,
+      query='%(course_videos)s AND %(downloads)s' % {
+        course_videos: teachers_common.queries.course_videos,
+        downloads: teachers_common.queries.downloads,
+      },
+      metrics=[utils.metrics.cardinality(common.fields.actor.account.name)],
+      bucketAggs=[
+        {
+          id: '5',
+          field: common.fields.context.contextActivities.parent.id,
+          type: 'terms',
+          settings: {
+            size: '0',
+            order: 'desc',
+            orderBy: '_count',
+          },
+        },
+      ],
+      timeField='@timestamp'
+    )
+  ),
+  gridPos={ x: 16, y: 14.5, w: 4, h: 4 }
+)
+.addPanel(
+  statPanel.new(
+    title='Average video downloads',
+    description=|||
+      Average number of downloads per video.
+    |||,
+    datasource=common.datasources.lrs,
+    graphMode='none',
+    reducerFunction='mean',
+    unit='none',
+  ).addTarget(
+    elasticsearch.target(
+      datasource=common.datasources.lrs,
+      query='%(course_videos)s AND %(downloads)s' % {
+        course_videos: teachers_common.queries.course_videos,
+        downloads: teachers_common.queries.downloads,
+      },
+      metrics=[utils.metrics.count],
+      bucketAggs=[
+        {
+          id: 'name',
+          field: common.fields.object.id,
+          type: 'terms',
+          settings: {
+            order: 'desc',
+            orderBy: '_count',
+            size: '0',
+          },
+        },
+      ],
+      timeField='@timestamp'
+    )
+  ),
+  gridPos={ x: 20, y: 14.5, w: 4, h: 4 }
+)
+.addPanel(
+  row.new(title='Videos statistics', collapse=false),
+  gridPos={ x: 0, y: 18.5, w: 24, h: 1 }
 )
 .addPanel(
   {
@@ -599,5 +708,5 @@ dashboard.new(
       },
     ],
   },
-  gridPos={ x: 0, y: 12, w: 24, h: 18 }
+  gridPos={ x: 0, y: 19.5, w: 24, h: 12 }
 )
