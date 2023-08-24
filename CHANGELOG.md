@@ -8,6 +8,12 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## Changed
+
+- Define `duration` and `title` panel for `Course video details` dashboard
+- Define a set of `downloads` panels for `Course video overview` dashboard
+- Modify the dashboards layout to a line display, grouping panels by theme
+
 ## [1.0.0] - 2023-07-20
 
 ### Changed
