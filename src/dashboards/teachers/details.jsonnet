@@ -41,20 +41,12 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query=teachers_common.queries.views,
-      metrics=[common.metrics.count],
-      bucketAggs=[
-        {
-          id: 'date',
-          field: '@timestamp',
-          settings: {
-            interval: '1d',
-            min_doc_count: '0',
-            trimEdges: '0',
-          },
-          type: 'date_histogram',
-        },
-      ],
+      query='%(video_iri)s AND %(views)s' % {
+        video_iri: teachers_common.queries.video_iri,
+        views: teachers_common.queries.views,
+      },
+      metrics=[utils.metrics.count],
+      bucketAggs=[utils.aggregations.date_histogram()],
       timeField='@timestamp'
     )
   ),
@@ -107,20 +99,12 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query=teachers_common.queries.complete_views,
-      metrics=[common.metrics.count],
-      bucketAggs=[
-        {
-          id: '5',
-          field: '@timestamp',
-          settings: {
-            interval: '1d',
-            min_doc_count: '0',
-            trimEdges: '0',
-          },
-          type: 'date_histogram',
-        },
-      ],
+      query='%(video_iri)s AND %(complete_views)s' % {
+        video_iri: teachers_common.queries.video_iri,
+        complete_views: teachers_common.queries.complete_views,
+      },
+      metrics=[utils.metrics.count],
+      bucketAggs=[utils.aggregations.date_histogram()],
       timeField='@timestamp'
     )
   ),
@@ -173,20 +157,12 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query=teachers_common.queries.downloads,
-      metrics=[common.metrics.count],
-      bucketAggs=[
-        {
-          id: 'date',
-          field: '@timestamp',
-          settings: {
-            interval: '1d',
-            min_doc_count: '0',
-            trimEdges: '0',
-          },
-          type: 'date_histogram',
-        },
-      ],
+      query='%(video_iri)s AND %(downloads)s' % {
+        video_iri: teachers_common.queries.video_iri,
+        downloads: teachers_common.queries.downloads,
+      },
+      metrics=[utils.metrics.count],
+      bucketAggs=[utils.aggregations.date_histogram()],
       timeField='@timestamp'
     )
   ),
@@ -326,7 +302,7 @@ dashboard.new(
       {
         bucketAggs: [
           {
-            field: teachers_common.fields.result_extensions_time,
+            field: common.fields.result.extensions.time,
             id: '2',
             settings: {
               interval: teachers_common.constants.event_group_interval,
@@ -335,7 +311,7 @@ dashboard.new(
             type: 'histogram',
           },
           {
-            field: teachers_common.fields.verb_display_en_us,
+            field: common.fields.verb.display.en_US,
             id: '3',
             settings: {
               min_doc_count: '0',
@@ -346,8 +322,8 @@ dashboard.new(
             type: 'terms',
           },
         ],
-        metrics: [common.metrics.count],
-        query: teachers_common.queries.video_id,
+        metrics: [utils.metrics.count],
+        query: teachers_common.queries.video_iri,
         refId: 'A',
         timeField: '@timestamp',
       },
@@ -365,8 +341,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query=teachers_common.queries.video_id,
-      metrics=[common.metrics.count],
+      query=teachers_common.queries.video_iri,
+      metrics=[utils.metrics.count],
       bucketAggs=[
         {
           id: 'verb',
@@ -379,16 +355,7 @@ dashboard.new(
             size: '0',
           },
         },
-        {
-          id: 'date',
-          field: '@timestamp',
-          type: 'date_histogram',
-          settings: {
-            interval: '1h',
-            min_doc_count: '0',
-            trimEdges: '0',
-          },
-        },
+        utils.aggregations.date_histogram(interval='1h', min_doc_count=0),
       ],
       timeField='@timestamp'
     )
@@ -408,14 +375,12 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_query)s' % {
-        video_query: teachers_common.queries.video_id,
-      },
-      metrics=[common.metrics.count],
+      query=teachers_common.queries.video_iri,
+      metrics=[utils.metrics.count],
       bucketAggs=[
         {
           id: '2',
-          field: teachers_common.fields.verb_display_en_us,
+          field: common.fields.verb.display.en_US,
           type: 'terms',
           settings: {
             order: 'asc',
@@ -424,16 +389,7 @@ dashboard.new(
             size: '0',
           },
         },
-        {
-          id: '3',
-          type: 'date_histogram',
-          field: '@timestamp',
-          settings: {
-            interval: 'auto',
-            min_doc_count: '0',
-            trimEdges: '0',
-          },
-        },
+        utils.aggregations.date_histogram(min_doc_count=0),
       ],
       timeField='@timestamp'
     )
@@ -451,22 +407,23 @@ dashboard.new(
       The number of learners who have activated the subtitles.
     |||,
     datasource=common.datasources.lrs,
-    fields=common.fields.actor_account_name,
+    fields=common.fields.actor.account.name,
     graphMode='none',
     reducerFunction='count',
     unit='none',
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(interacted_query)s AND %(subtitle_enabled)s:true' % {
-        interacted_query: teachers_common.queries.video_interacted,
-        subtitle_enabled: common.utils.single_escape_string(common.fields.subtitle_enabled),
+      query='%(video_iri)s AND %(interactions)s AND %(subtitle_enabled)s:true' % {
+        video_iri: teachers_common.queries.video_iri,
+        interactions: teachers_common.queries.interactions,
+        subtitle_enabled: utils.functions.single_escape_string(common.fields.context.extensions.subtitle_enabled),
       },
-      metrics=[common.metrics.count],
+      metrics=[utils.metrics.count],
       bucketAggs=[
         {
           id: '5',
-          field: common.fields.actor_account_name,
+          field: common.fields.actor.account.name,
           settings: {
             min_doc_count: '1',
             size: '0',
@@ -511,10 +468,11 @@ dashboard.new(
     targets: [
       {
         datasource: common.datasources.lrs,
-        query: '%(interacted_query)s' % {
-          interacted_query: teachers_common.queries.video_interacted,
+        query: '%(video_iri)s AND %(interactions)s' % {
+          video_iri: teachers_common.queries.video_iri,
+          interactions: teachers_common.queries.interactions,
         },
-        metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
+        metrics: [utils.metrics.cardinality(common.fields.actor.account.name)],
         bucketAggs: [
           {
             id: '2',
@@ -525,7 +483,7 @@ dashboard.new(
               order: 'desc',
               orderBy: '_term',
             },
-            field: common.fields.subtitle_language,
+            field: common.fields.context.extensions.subtitle_language,
           },
         ],
         timeField: '@timestamp',
@@ -542,22 +500,23 @@ dashboard.new(
       The number of learners who have switched to full screen.
     |||,
     datasource=common.datasources.lrs,
-    fields=common.fields.actor_account_name,
+    fields=common.fields.actor.account.name,
     graphMode='none',
     reducerFunction='count',
     unit='none',
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(interacted_query)s AND %(full_screen)s:true' % {
-        interacted_query: teachers_common.queries.video_interacted,
-        full_screen: common.utils.single_escape_string(common.fields.full_screen),
+      query='%(video_iri)s AND %(interactions)s AND %(full_screen)s:true' % {
+        video_iri: teachers_common.queries.video_iri,
+        interactions: teachers_common.queries.interactions,
+        full_screen: utils.functions.single_escape_string(common.fields.context.extensions.full_screen),
       },
-      metrics=[common.metrics.count],
+      metrics=[utils.metrics.count],
       bucketAggs=[
         {
           id: '5',
-          field: common.fields.actor_account_name,
+          field: common.fields.actor.account.name,
           settings: {
             min_doc_count: '1',
             size: '0',
@@ -603,10 +562,11 @@ dashboard.new(
     targets: [
       {
         datasource: common.datasources.lrs,
-        query: '%(video_interacted)s' % {
-          video_interacted: teachers_common.queries.video_interacted,
+        query: '%(video_iri)s AND %(interactions)s' % {
+          video_iri: teachers_common.queries.video_iri,
+          interactions: teachers_common.queries.interactions,
         },
-        metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
+        metrics: [utils.metrics.cardinality(common.fields.actor.account.name)],
         bucketAggs: [
           {
             id: '2',
@@ -617,7 +577,7 @@ dashboard.new(
               order: 'desc',
               orderBy: '_term',
             },
-            field: common.fields.speed,
+            field: common.fields.context.extensions.speed,
           },
         ],
         timeField: '@timestamp',
@@ -630,7 +590,7 @@ dashboard.new(
         options: {
           filters: [
             {
-              fieldName: common.fields.speed,
+              fieldName: common.fields.context.extensions.speed,
               config: {
                 id: 'equal',
                 options: {
@@ -678,10 +638,11 @@ dashboard.new(
     targets: [
       {
         datasource: common.datasources.lrs,
-        query: '%(interacted_query)s' % {
-          interacted_query: teachers_common.queries.video_interacted,
+        query: '%(video_iri)s AND %(interactions)s' % {
+          video_iri: teachers_common.queries.video_iri,
+          interactions: teachers_common.queries.interactions,
         },
-        metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
+        metrics: [utils.metrics.cardinality(common.fields.actor.account.name)],
         bucketAggs: [
           {
             id: '2',
@@ -692,7 +653,7 @@ dashboard.new(
               order: 'desc',
               orderBy: '_term',
             },
-            field: common.fields.quality,
+            field: common.fields.context.extensions.quality,
           },
         ],
         timeField: '@timestamp',
@@ -705,7 +666,7 @@ dashboard.new(
         options: {
           conversions: [
             {
-              targetField: common.fields.quality,
+              targetField: common.fields.context.extensions.quality,
               destinationType: 'string',
             },
           ],
@@ -716,7 +677,7 @@ dashboard.new(
         options: {
           filters: [
             {
-              fieldName: common.fields.quality,
+              fieldName: common.fields.context.extensions.quality,
               config: {
                 id: 'equal',
                 options: {
@@ -750,7 +711,7 @@ dashboard.new(
         {
           matcher: {
             id: 'byName',
-            options: common.fields.volume,
+            options: common.fields.context.extensions.volume,
           },
           properties: [
             {
@@ -799,10 +760,11 @@ dashboard.new(
     targets: [
       {
         datasource: common.datasources.lrs,
-        query: '%(interacted_query)s' % {
-          interacted_query: teachers_common.queries.video_interacted,
+        query: '%(video_iri)s AND %(interactions)s' % {
+          video_iri: teachers_common.queries.video_iri,
+          interactions: teachers_common.queries.interactions,
         },
-        metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
+        metrics: [utils.metrics.cardinality(common.fields.actor.account.name)],
         bucketAggs: [
           {
             id: '2',
@@ -813,7 +775,7 @@ dashboard.new(
               order: 'desc',
               orderBy: '_term',
             },
-            field: common.fields.volume,
+            field: common.fields.context.extensions.volume,
           },
         ],
         timeField: '@timestamp',
@@ -826,7 +788,7 @@ dashboard.new(
         options: {
           conversions: [
             {
-              targetField: common.fields.volume,
+              targetField: common.fields.context.extensions.volume,
               destinationType: 'string',
             },
           ],
@@ -837,7 +799,7 @@ dashboard.new(
         options: {
           filters: [
             {
-              fieldName: common.fields.volume,
+              fieldName: common.fields.context.extensions.volume,
               config: {
                 id: 'equal',
                 options: {

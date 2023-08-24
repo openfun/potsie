@@ -1,23 +1,17 @@
 // Teacher commons
 
-local grafana = import 'grafonnet/grafana.libsonnet';
-local template = grafana.template;
-local link = grafana.link;
 local common = import '../common.libsonnet';
+local grafana = import 'grafonnet/grafana.libsonnet';
+local link = grafana.link;
+local template = grafana.template;
+local utils = import '../utils.libsonnet';
 
 {
   constants:
     {
       view_count_threshold: '30',
-      statements_interval: '1d',
       event_group_interval: '1',
     },
-  fields: {
-    context_extensions_completion_threshold: 'context.extensions.https://w3id.org/xapi/video/extensions/completion-threshold',
-    result_extensions_length: 'result.extensions.https://w3id.org/xapi/video/extensions/length',
-    result_extensions_time: 'result.extensions.https://w3id.org/xapi/video/extensions/time',
-    verb_display_en_us: 'verb.display.en-US.keyword',
-  },
   link: {
     teacher: link.dashboards(
       includeVars=true,
@@ -28,9 +22,8 @@ local common = import '../common.libsonnet';
     ),
   },
   queries: {
-    complete_views: '%(video_query)s AND verb.id:"%(verb_completed)s"' % {
-      video_query: $.queries.video_id,
-      verb_completed: common.verb_ids.completed,
+    complete_views: 'verb.id:"%(verb_completed)s"' % {
+      verb_completed: common.fields.verb.id.completed,
     },
     course_key: 'context.contextActivities.parent.id:${EDX_COURSE_KEY:doublequote}',
     course_enrollments: 'SELECT DISTINCT COUNT(`user_id`) FROM `student_courseenrollment` WHERE (`is_active`=1 AND `course_id`="${EDX_COURSE_KEY}")',
@@ -41,20 +34,18 @@ local common = import '../common.libsonnet';
       course_key: $.queries.course_key,
     },
     course_videos: 'object.id:${COURSE_VIDEOS_IDS_WITH_UUID:lucene}',
-    downloads: '%(video_query)s AND verb.id:"%(verb_downloaded)s"' % {
-      video_query: $.queries.video_id,
-      verb_downloaded: common.verb_ids.downloaded,
+    downloads: 'verb.id:"%(verb_downloaded)s"' % {
+      verb_downloaded: common.fields.verb.id.downloaded,
     },
     edx_course_key: 'SELECT `key` FROM courses_course WHERE `key`="${EDX_COURSE_KEY}"',
-    video_interacted: '%(video_query)s AND verb.id:"%(verb_interacted)s"' % {
-      video_query: $.queries.video_id,
-      verb_interacted: common.verb_ids.interacted,
+    interactions: 'verb.id:"%(verb_interacted)s"' % {
+      verb_interacted: common.fields.verb.id.interacted,
     },
-    video_id: 'object.id:${VIDEO:doublequote}',
-    views: '%(video_query)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
-      video_query: $.queries.video_id,
-      verb_played: common.verb_ids.played,
-      time: common.utils.single_escape_string($.fields.result_extensions_time),
+    video_iri: 'object.id:${VIDEO_IRI:doublequote}',
+    video_title: 'SELECT title from video where id=${VIDEO_ID:sqlstring}',
+    views: 'verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+      verb_played: common.fields.verb.id.played,
+      time: utils.functions.single_escape_string(common.fields.result.extensions.time),
       view_count_threshold: $.constants.view_count_threshold,
     },
   },
@@ -73,8 +64,8 @@ local common = import '../common.libsonnet';
       refresh='time',
       sort=1,
     ),
-    title: template.new(
-      name='TITLE',
+    course_title: template.new(
+      name='COURSE_TITLE',
       current='all',
       label='Title',
       datasource=common.datasources.edx_app,
@@ -109,24 +100,44 @@ local common = import '../common.libsonnet';
       hide='variable',
       refresh='time'
     ),
-    video: template.new(
-      name='VIDEO',
+    video_iri: template.new(
+      name='VIDEO_IRI',
       label='Video',
       datasource=common.datasources.lrs,
-      query='{"find": "terms", "field": "%(video_id)s", "query": "%(course_key)s"}' % {
-        video_id: common.fields.video_id,
+      query='{"find": "terms", "field": "%(video_iri)s", "query": "%(course_key)s"}' % {
+        video_iri: common.fields.object.id,
         course_key: $.queries.course_key,
       },
       refresh='time'
     ),
-    course_video_ids: template.new(
+    video_id: template.new(
+      name='VIDEO_ID',
+      label='Video',
+      datasource=common.datasources.lrs,
+      query='{"find": "terms", "field": "%(video_iri)s", "query": "object.id:${VIDEO_IRI}"}' % {
+        video_iri: common.fields.object.id,
+      },
+      regex='/uuid\\:\\/\\/(?<value>.*)/',
+      hide='variable',
+      refresh='time'
+    ),
+    video_title: template.new(
+      name='VIDEO_TITLE',
+      current='all',
+      label='Title',
+      datasource=common.datasources.marsha,
+      query=$.queries.video_title,
+      hide='variable',
+      refresh='time'
+    ),
+    course_videos_ids: template.new(
       name='COURSE_VIDEOS_IDS',
       current='all',
       hide='variable',
       label='Course videos identifiers',
       datasource=common.datasources.lrs,
-      query='{"find": "terms", "field": "%(video_id)s", "query": "%(course_key)s"}' % {
-        video_id: common.fields.video_id,
+      query='{"find": "terms", "field": "%(video_iri)s", "query": "%(course_key)s"}' % {
+        video_iri: common.fields.object.id,
         course_key: $.queries.course_key,
       },
       multi='true',
@@ -134,14 +145,14 @@ local common = import '../common.libsonnet';
       regex='/uuid\\:\\/\\/(?<value>.*)/',
       refresh='time',
     ),
-    course_video_ids_with_uuid: template.new(
+    course_videos_iris: template.new(
       name='COURSE_VIDEOS_IDS_WITH_UUID',
       hide='variable',
       current='all',
       label='Video',
       datasource=common.datasources.lrs,
-      query='{"find": "terms", "field": "%(video_id)s", "query": "%(course_key)s"}' % {
-        video_id: common.fields.video_id,
+      query='{"find": "terms", "field": "%(video_iri)s", "query": "%(course_key)s"}' % {
+        video_iri: common.fields.object.id,
         course_key: $.queries.course_key,
       },
       multi='true',

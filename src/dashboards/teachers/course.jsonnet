@@ -20,11 +20,11 @@ dashboard.new(
 )
 .addLink(teachers_common.link.teacher)
 .addTemplate(teachers_common.templates.edx_course_key)
-.addTemplate(teachers_common.templates.title)
+.addTemplate(teachers_common.templates.course_title)
 .addTemplate(teachers_common.templates.start_date)
 .addTemplate(teachers_common.templates.end_date)
-.addTemplate(teachers_common.templates.course_video_ids)
-.addTemplate(teachers_common.templates.course_video_ids_with_uuid)
+.addTemplate(teachers_common.templates.course_videos_ids)
+.addTemplate(teachers_common.templates.course_videos_iris)
 .addPanel(
   text.new(
     title='Course title',
@@ -57,11 +57,11 @@ dashboard.new(
     elasticsearch.target(
       datasource=common.datasources.lrs,
       query=teachers_common.queries.course_videos,
-      metrics=[common.metrics.count],
+      metrics=[utils.metrics.count],
       bucketAggs=[
         {
           id: 'video',
-          field: common.fields.video_id,
+          field: common.fields.object.id,
           type: 'terms',
           settings: {
             min_doc_count: '1',
@@ -111,68 +111,36 @@ dashboard.new(
     elasticsearch.target(
       alias='Views',
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+      query='%(course_videos)s AND %(views)s' % {
         course_videos: teachers_common.queries.course_videos,
-        verb_played: common.verb_ids.played,
-        time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
-        view_count_threshold: teachers_common.constants.view_count_threshold,
+        views: teachers_common.queries.views,
       },
-      metrics=[common.metrics.count],
-      bucketAggs=[
-        {
-          id: 'date',
-          field: '@timestamp',
-          type: 'date_histogram',
-          settings: {
-            interval: '1d',
-            trimEdges: '0',
-          },
-        },
-      ],
+      metrics=[utils.metrics.count],
+      bucketAggs=[utils.aggregations.date_histogram(min_doc_count=0)],
       timeField='@timestamp'
     )
   ).addTarget(
     elasticsearch.target(
       alias='Complete views',
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND verb.id:"%(verb_completed)s"' % {
+      query='%(course_videos)s AND %(complete_views)s' % {
         course_videos: teachers_common.queries.course_videos,
-        verb_completed: common.verb_ids.completed,
+        complete_views: teachers_common.queries.complete_views,
       },
-      metrics=[common.metrics.count],
-      bucketAggs=[
-        {
-          id: 'date',
-          field: '@timestamp',
-          type: 'date_histogram',
-          settings: {
-            interval: '1d',
-            trimEdges: '0',
-          },
-        },
-      ],
+      metrics=[utils.metrics.count],
+      bucketAggs=[utils.aggregations.date_histogram(min_doc_count=0)],
       timeField='@timestamp'
     )
   ).addTarget(
     elasticsearch.target(
       alias='Downloads',
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND verb.id:"%(verb_downloaded)s"' % {
+      query='%(course_videos)s AND %(downloads)s' % {
         course_videos: teachers_common.queries.course_videos,
-        verb_downloaded: common.verb_ids.downloaded,
+        downloads: teachers_common.queries.downloads,
       },
-      metrics=[common.metrics.count],
-      bucketAggs=[
-        {
-          id: 'date',
-          field: '@timestamp',
-          type: 'date_histogram',
-          settings: {
-            interval: '1d',
-            trimEdges: '0',
-          },
-        },
-      ],
+      metrics=[utils.metrics.count],
+      bucketAggs=[utils.aggregations.date_histogram(min_doc_count=0)],
       timeField='@timestamp'
     )
   ),
@@ -195,14 +163,12 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+      query='%(course_videos)s AND %(views)s' % {
         course_videos: teachers_common.queries.course_videos,
-        verb_played: common.verb_ids.played,
-        time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
-        view_count_threshold: teachers_common.constants.view_count_threshold,
+        views: teachers_common.queries.views,
       },
-      metrics=[common.metrics.count],
-      bucketAggs=[common.objects.date_histogram('%(statements_interval)s' % { statements_interval: teachers_common.constants.statements_interval })],
+      metrics=[utils.metrics.count],
+      bucketAggs=[utils.aggregations.date_histogram()],
       timeField='@timestamp'
     )
   ),
@@ -222,17 +188,15 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+      query='%(course_videos)s AND %(views)s' % {
         course_videos: teachers_common.queries.course_videos,
-        verb_played: common.verb_ids.played,
-        time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
-        view_count_threshold: teachers_common.constants.view_count_threshold,
+        views: teachers_common.queries.views,
       },
-      metrics=[common.metrics.cardinality(common.fields.actor_account_name)],
+      metrics=[utils.metrics.cardinality(common.fields.actor.account.name)],
       bucketAggs=[
         {
           id: 'name',
-          field: common.fields.parent_id,
+          field: common.fields.context.contextActivities.parent.id,
           type: 'terms',
           settings: {
             order: 'desc',
@@ -259,17 +223,15 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+      query='%(course_videos)s AND %(views)s' % {
         course_videos: teachers_common.queries.course_videos,
-        verb_played: common.verb_ids.played,
-        time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
-        view_count_threshold: teachers_common.constants.view_count_threshold,
+        views: teachers_common.queries.views,
       },
-      metrics=[common.metrics.count],
+      metrics=[utils.metrics.count],
       bucketAggs=[
         {
           id: 'video',
-          field: common.fields.video_id,
+          field: common.fields.object.id,
           type: 'terms',
           settings: {
             order: 'desc',
@@ -297,12 +259,12 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND verb.id:"%(verb_completed)s"' % {
+      query='%(course_videos)s AND %(complete_views)s' % {
         course_videos: teachers_common.queries.course_videos,
-        verb_completed: common.verb_ids.completed,
+        complete_views: teachers_common.queries.complete_views,
       },
-      metrics=[common.metrics.count],
-      bucketAggs=[common.objects.date_histogram()],
+      metrics=[utils.metrics.count],
+      bucketAggs=[utils.aggregations.date_histogram()],
       timeField='@timestamp'
     )
   ),
@@ -322,15 +284,15 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND verb.id:"%(verb_completed)s"' % {
+      query='%(course_videos)s AND %(complete_views)s' % {
         course_videos: teachers_common.queries.course_videos,
-        verb_completed: common.verb_ids.completed,
+        complete_views: teachers_common.queries.complete_views,
       },
-      metrics=[common.metrics.cardinality(common.fields.actor_account_name)],
+      metrics=[utils.metrics.cardinality(common.fields.actor.account.name)],
       bucketAggs=[
         {
           id: '5',
-          field: common.fields.parent_id,
+          field: common.fields.context.contextActivities.parent.id,
           type: 'terms',
           settings: {
             size: '0',
@@ -361,11 +323,11 @@ dashboard.new(
         course_videos: teachers_common.queries.course_videos,
         verb_completed: common.verb_ids.completed,
       },
-      metrics=[common.metrics.count],
+      metrics=[utils.metrics.count],
       bucketAggs=[
         {
           id: 'name',
-          field: common.fields.video_id,
+          field: common.fields.object.id,
           type: 'terms',
           settings: {
             order: 'desc',
@@ -420,7 +382,7 @@ dashboard.new(
                 {
                   targetBlank: true,
                   title: 'View detailled insights about this video',
-                  url: '/d/%(course_video_details_uid)s/details?orgId=1&${EDX_COURSE_KEY:queryparam}&var-VIDEO=${__value.text}' % {
+                  url: '/d/%(course_video_details_uid)s/details?orgId=1&${EDX_COURSE_KEY:queryparam}&var-VIDEO_IRI=${__value.text}' % {
                     course_video_details_uid: common.uids.course_video_details,
                   },
                 },
@@ -497,7 +459,7 @@ dashboard.new(
       {
         bucketAggs: [
           {
-            field: common.fields.video_id,
+            field: common.fields.object.id,
             id: '2',
             settings: {
               min_doc_count: '1',
@@ -515,11 +477,9 @@ dashboard.new(
             type: 'count',
           },
         ],
-        query: '%(course_videos)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+        query: '%(course_videos)s AND %(views)s' % {
           course_videos: teachers_common.queries.course_videos,
-          verb_played: common.verb_ids.played,
-          time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
-          view_count_threshold: teachers_common.constants.view_count_threshold,
+          views: teachers_common.queries.views,
         },
         refId: 'Videos views query',
         timeField: '@timestamp',
@@ -572,7 +532,7 @@ dashboard.new(
         bucketAggs: [
           {
             id: 'name',
-            field: common.fields.video_id,
+            field: common.fields.object.id,
             type: 'terms',
             settings: {
               min_doc_count: '1',
@@ -583,12 +543,10 @@ dashboard.new(
           },
         ],
         datasource: common.datasources.lrs,
-        metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
-        query: '%(course_videos)s AND verb.id:"%(verb_played)s" AND %(time)s:[0 TO %(view_count_threshold)s]' % {
+        metrics: [utils.metrics.cardinality(common.fields.actor.account.name)],
+        query: '%(course_videos)s AND %(views)s' % {
           course_videos: teachers_common.queries.course_videos,
-          verb_played: common.verb_ids.played,
-          time: common.utils.single_escape_string(teachers_common.fields.result_extensions_time),
-          view_count_threshold: teachers_common.constants.view_count_threshold,
+          views: teachers_common.queries.views,
         },
         refId: 'Videos unique views query',
         timeField: '@timestamp',
@@ -597,7 +555,7 @@ dashboard.new(
         bucketAggs: [
           {
             id: 'name',
-            field: common.fields.video_id,
+            field: common.fields.object.id,
             type: 'terms',
             settings: {
               order: 'desc',
@@ -608,10 +566,10 @@ dashboard.new(
           },
         ],
         datasource: common.datasources.lrs,
-        metrics: [common.metrics.count],
-        query: '%(course_videos)s AND verb.id:"%(verb_completed)s"' % {
+        metrics: [utils.metrics.count],
+        query: '%(course_videos)s AND %(complete_views)s' % {
           course_videos: teachers_common.queries.course_videos,
-          verb_completed: common.verb_ids.completed,
+          complete_views: teachers_common.queries.complete_views,
         },
         refId: 'Videos complete views query',
         timeField: '@timestamp',
@@ -619,7 +577,7 @@ dashboard.new(
       {
         bucketAggs: [
           {
-            field: common.fields.video_id,
+            field: common.fields.object.id,
             id: '2',
             settings: {
               min_doc_count: '1',
@@ -631,10 +589,10 @@ dashboard.new(
           },
         ],
         datasource: common.datasources.lrs,
-        metrics: [common.metrics.cardinality(common.fields.actor_account_name)],
-        query: '%(course_videos)s AND verb.id:"%(verb_completed)s"' % {
+        metrics: [utils.metrics.cardinality(common.fields.actor.account.name)],
+        query: '%(course_videos)s AND %(complete_views)s' % {
           course_videos: teachers_common.queries.course_videos,
-          verb_completed: common.verb_ids.completed,
+          complete_views: teachers_common.queries.complete_views,
         },
         refId: 'Videos complete unique views query',
         timeField: '@timestamp',
