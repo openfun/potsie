@@ -7,38 +7,47 @@
     marsha: 'marsha',
   },
   fields: {
-    actor_account_name: 'actor.account.name.keyword',
-    video_id: 'object.id',
-    subtitle_enabled: 'context.extensions.https://w3id.org/xapi/video/extensions/cc-subtitle-enabled',
-    full_screen: 'context.extensions.https://w3id.org/xapi/video/extensions/full-screen',
-    speed: 'context.extensions.https://w3id.org/xapi/video/extensions/speed.keyword',
-    subtitle_language: 'context.extensions.https://w3id.org/xapi/video/extensions/cc-subtitle-lang.keyword',
-    quality: 'context.extensions.https://w3id.org/xapi/video/extensions/quality',
-    volume: 'context.extensions.https://w3id.org/xapi/video/extensions/volume',
-    parent_id: 'context.contextActivities.parent.id.keyword'
-  },
-  metrics: {
-    count: { id: '1', type: 'count' },
-    cardinality(field):: {
-      id: '1',
-      type: 'cardinality',
-      field: field,
+    actor: {
+      account: {
+        name: 'actor.account.name.keyword',
+      },
     },
-    max(field):: {
-      id: '1',
-      type: 'max',
-      field: field,
+    object: {
+      id: 'object.id',
     },
-  },
-  objects: {
-    date_histogram(interval='auto', min_doc_count='1'):: {
-      id: 'date',
-      field: '@timestamp',
-      type: 'date_histogram',
-      settings: {
-        interval: interval,
-        min_doc_count: min_doc_count,
-        trimEdges: '0',
+    verb: {
+      display: {
+        en_US: 'verb.display.en-US.keyword',
+      },
+      id: {
+        completed: 'http://adlnet.gov/expapi/verbs/completed',
+        initialized: 'http://adlnet.gov/expapi/verbs/initialized',
+        played: 'https://w3id.org/xapi/video/verbs/played',
+        downloaded: 'http://id.tincanapi.com/verb/downloaded',
+        interacted: 'http://adlnet.gov/expapi/verbs/interacted',
+      },
+    },
+    context: {
+      contextActivities: {
+        parent: {
+          id: 'context.contextActivities.parent.id',
+        },
+      },
+      extensions: {
+        completion_threshold: 'context.extensions.https://w3id.org/xapi/video/extensions/completion-threshold',
+        subtitle_enabled: 'context.extensions.https://w3id.org/xapi/video/extensions/cc-subtitle-enabled',
+        full_screen: 'context.extensions.https://w3id.org/xapi/video/extensions/full-screen',
+        length: 'context.extensions.https://w3id.org/xapi/video/extensions/length',
+        speed: 'context.extensions.https://w3id.org/xapi/video/extensions/speed.keyword',
+        subtitle_language: 'context.extensions.https://w3id.org/xapi/video/extensions/cc-subtitle-lang.keyword',
+        quality: 'context.extensions.https://w3id.org/xapi/video/extensions/quality',
+        volume: 'context.extensions.https://w3id.org/xapi/video/extensions/volume',
+      },
+    },
+    result: {
+      extensions: {
+        length: 'result.extensions.https://w3id.org/xapi/video/extensions/length',
+        time: 'result.extensions.https://w3id.org/xapi/video/extensions/time',
       },
     },
   },
@@ -48,20 +57,9 @@
     video: 'video',
     xapi: 'xAPI',
   },
-  utils: {
-    double_escape_string(x):: std.strReplace(std.strReplace(std.strReplace(x, ':', '\\\\:'), '/', '\\\\/'), '-', '\\\\-'),
-    single_escape_string(x):: std.strReplace(std.strReplace(std.strReplace(x, ':', '\\:'), '/', '\\/'), '-', '\\-'),
-  },
   uids: {
     course_video_overview: '855bbd9f-09eb-42ac-aa5f-d0a2c6f8ee34',
     course_video_details: 'c6cc2218-4fea-4b4c-a622-245f3aa22893',
     teachers_home: '451f4aa3-d094-429e-ad87-4b6c809ffa35',
-  },
-  verb_ids: {
-    completed: 'http://adlnet.gov/expapi/verbs/completed',
-    initialized: 'http://adlnet.gov/expapi/verbs/initialized',
-    played: 'https://w3id.org/xapi/video/verbs/played',
-    downloaded: 'http://id.tincanapi.com/verb/downloaded',
-    interacted: 'http://adlnet.gov/expapi/verbs/interacted',
   },
 }
