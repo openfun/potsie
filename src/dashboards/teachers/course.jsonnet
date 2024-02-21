@@ -91,6 +91,8 @@ dashboard.new(
           settings: {
             min_doc_count: '1',
             size: '0',
+            order: 'desc',
+            orderBy: '_term',
           },
         },
       ],
