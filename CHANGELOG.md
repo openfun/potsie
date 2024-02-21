@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [1.2.0] - 2024-02-21
+
 ### Changed
 
 - Upgrade `Grafana` to 10.3.3
@@ -170,6 +172,7 @@ with corresponding Teachers Course Video Details Dashboard
 - Video details Dashboard
 
 [unreleased]: https://github.com/openfun/potsie/compare/v1.1.0...main
+[1.2.0]: https://github.com/openfun/potsie/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/openfun/potsie/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/openfun/potsie/compare/v0.8.0...v1.0.0
 [0.8.0]: https://github.com/openfun/potsie/compare/v0.7.0...v0.8.0
