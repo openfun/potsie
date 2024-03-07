@@ -10,17 +10,20 @@ GF_SECURITY_ADMIN_PASSWORD=pass
 
 # OAUTH
 GF_AUTH_GENERIC_OAUTH_ENABLED=true
-GF_AUTH_GENERIC_OAUTH_NAME=keycloak
+GF_AUTH_GENERIC_OAUTH_NAME=Keycloak-OAuth
 GF_AUTH_GENERIC_OAUTH_ALLOW_SIGN_UP=true
 GF_AUTH_GENERIC_OAUTH_CLIENT_ID=potsie
 GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET=fa9e98ee-61a1-4092-8dac-1597da0c1bb0
+GF_AUTH_GENERIC_OAUTH_SCOPES="openid"
+GF_AUTH_GENERIC_OAUTH_EMAIL_ATTRIBUTE_PATH="email"
+GF_AUTH_GENERIC_OAUTH_LOGIN_ATTRIBUTE_PATH="username"
+GF_AUTH_GENERIC_OAUTH_NAME_ATTRIBUTE_PATH="full_name"
 GF_AUTH_GENERIC_OAUTH_AUTH_URL=http://localhost:8080/auth/realms/fun-mooc/protocol/openid-connect/auth
 GF_AUTH_GENERIC_OAUTH_TOKEN_URL=http://keycloak:8080/auth/realms/fun-mooc/protocol/openid-connect/token
 GF_AUTH_GENERIC_OAUTH_API_URL=http://keycloak:8080/auth/realms/fun-mooc/protocol/openid-connect/userinfo
 GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH="contains(roles[*], 'admin') && 'Admin' || contains(roles[*], 'editor') && 'Editor' || 'Viewer'"
 GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_STRICT=true
-GF_AUTH_GENERIC_OAUTH_TLS_SKIP_VERIFY_INSECURE=true
-GF_AUTH_GENERIC_OAUTH_SCOPES="openid"
+GF_AUTH_OAUTH_ALLOW_INSECURE_EMAIL_LOOKUP=true
 GF_LOG_FILTERS="oauth.generic_oauth:debug"
 # ⚠️ ⚠️   Activate debug level globally
 # GF_LOG_LEVEL="debug"

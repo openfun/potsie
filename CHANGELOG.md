@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## Added
+
+- Enable email lookup for Keycloak-OAuth
+
 ## [1.2.0] - 2024-02-21
 
 ### Changed
