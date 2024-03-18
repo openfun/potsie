@@ -8,7 +8,9 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
-## Added
+## [1.2.1] - 2024-03-18
+
+### Added
 
 - Enable email lookup for Keycloak-OAuth
 
@@ -175,7 +177,8 @@ with corresponding Teachers Course Video Details Dashboard
 
 - Video details Dashboard
 
-[unreleased]: https://github.com/openfun/potsie/compare/v1.1.0...main
+[unreleased]: https://github.com/openfun/potsie/compare/v1.2.1...main
+[1.2.1]: https://github.com/openfun/potsie/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/openfun/potsie/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/openfun/potsie/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/openfun/potsie/compare/v0.8.0...v1.0.0
