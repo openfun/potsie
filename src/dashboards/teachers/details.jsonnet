@@ -50,7 +50,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_iri)s AND verb.id:"%(verb_initialized)s"' % {
+      query='%(course_key)s AND %(video_iri)s AND verb.id:"%(verb_initialized)s"' % {
+        course_key: teachers_common.queries.course_key,
         video_iri: teachers_common.queries.video_iri,
         verb_initialized: common.fields.verb.id.initialized,
       },
@@ -75,7 +76,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_iri)s AND verb.id:"%(verb_initialized)s"' % {
+      query='%(course_key)s AND %(video_iri)s AND verb.id:"%(verb_initialized)s"' % {
+        course_key: teachers_common.queries.course_key,
         video_iri: teachers_common.queries.video_iri,
         verb_initialized: common.fields.verb.id.initialized,
       },
@@ -109,7 +111,8 @@ dashboard.new(
     elasticsearch.target(
       alias='Views',
       datasource=common.datasources.lrs,
-      query='%(video_iri)s AND %(views)s' % {
+      query='%(course_key)s AND %(video_iri)s AND %(views)s' % {
+        course_key: teachers_common.queries.course_key,
         video_iri: teachers_common.queries.video_iri,
         views: teachers_common.queries.views,
       },
@@ -121,7 +124,8 @@ dashboard.new(
     elasticsearch.target(
       alias='Complete views',
       datasource=common.datasources.lrs,
-      query='%(video_iri)s AND %(complete_views)s' % {
+      query='%(course_key)s AND %(video_iri)s AND %(complete_views)s' % {
+        course_key: teachers_common.queries.course_key,
         video_iri: teachers_common.queries.video_iri,
         complete_views: teachers_common.queries.complete_views,
       },
@@ -133,7 +137,8 @@ dashboard.new(
     elasticsearch.target(
       alias='Downloads',
       datasource=common.datasources.lrs,
-      query='%(video_iri)s AND %(downloads)s' % {
+      query='%(course_key)s AND %(video_iri)s AND %(downloads)s' % {
+        course_key: teachers_common.queries.course_key,
         video_iri: teachers_common.queries.video_iri,
         downloads: teachers_common.queries.downloads,
       },
@@ -162,7 +167,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_iri)s AND %(views)s' % {
+      query='%(course_key)s AND %(video_iri)s AND %(views)s' % {
+        course_key: teachers_common.queries.course_key,
         video_iri: teachers_common.queries.video_iri,
         views: teachers_common.queries.views,
       },
@@ -187,7 +193,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_iri)s AND %(views)s' % {
+      query='%(course_key)s AND %(video_iri)s AND %(views)s' % {
+        course_key: teachers_common.queries.course_key,
         video_iri: teachers_common.queries.video_iri,
         views: teachers_common.queries.views,
       },
@@ -223,7 +230,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_iri)s AND %(complete_views)s' % {
+      query='%(course_key)s AND %(video_iri)s AND %(complete_views)s' % {
+        course_key: teachers_common.queries.course_key,
         video_iri: teachers_common.queries.video_iri,
         complete_views: teachers_common.queries.complete_views,
       },
@@ -248,7 +256,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_iri)s AND %(complete_views)s' % {
+      query='%(course_key)s AND %(video_iri)s AND %(complete_views)s' % {
+        course_key: teachers_common.queries.course_key,
         video_iri: teachers_common.queries.video_iri,
         complete_views: teachers_common.queries.complete_views,
       },
@@ -284,7 +293,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_iri)s AND %(downloads)s' % {
+      query='%(course_key)s AND %(video_iri)s AND %(downloads)s' % {
+        course_key: teachers_common.queries.course_key,
         video_iri: teachers_common.queries.video_iri,
         downloads: teachers_common.queries.downloads,
       },
@@ -309,7 +319,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_iri)s AND %(downloads)s' % {
+      query='%(course_key)s AND %(video_iri)s AND %(downloads)s' % {
+        course_key: teachers_common.queries.course_key,
         video_iri: teachers_common.queries.video_iri,
         downloads: teachers_common.queries.downloads,
       },
@@ -376,7 +387,10 @@ dashboard.new(
           },
         ],
         metrics: [utils.metrics.count],
-        query: teachers_common.queries.video_iri,
+        query: '%(course_key)s AND %(video_iri)s' % {
+          course_key: teachers_common.queries.course_key,
+          video_iri: teachers_common.queries.video_iri,
+        },
         refId: 'A',
         timeField: '@timestamp',
       },
@@ -394,7 +408,10 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query=teachers_common.queries.video_iri,
+      query='%(course_key)s AND %(video_iri)s' % {
+        course_key: teachers_common.queries.course_key,
+        video_iri: teachers_common.queries.video_iri,
+      },
       metrics=[utils.metrics.count],
       bucketAggs=[
         {
@@ -428,7 +445,10 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query=teachers_common.queries.video_iri,
+      query='%(course_key)s AND %(video_iri)s' % {
+        course_key: teachers_common.queries.course_key,
+        video_iri: teachers_common.queries.video_iri,
+      },
       metrics=[utils.metrics.count],
       bucketAggs=[
         {
@@ -467,7 +487,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_iri)s AND %(interactions)s AND %(subtitle_enabled)s:true' % {
+      query='%(course_key)s AND %(video_iri)s AND %(interactions)s AND %(subtitle_enabled)s:true' % {
+        course_key: teachers_common.queries.course_key,
         video_iri: teachers_common.queries.video_iri,
         interactions: teachers_common.queries.interactions,
         subtitle_enabled: utils.functions.single_escape_string(common.fields.context.extensions.subtitle_enabled),
@@ -521,7 +542,8 @@ dashboard.new(
     targets: [
       {
         datasource: common.datasources.lrs,
-        query: '%(video_iri)s AND %(interactions)s' % {
+        query: '%(course_key)s AND %(video_iri)s AND %(interactions)s' % {
+          course_key: teachers_common.queries.course_key,
           video_iri: teachers_common.queries.video_iri,
           interactions: teachers_common.queries.interactions,
         },
@@ -560,7 +582,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(video_iri)s AND %(interactions)s AND %(full_screen)s:true' % {
+      query='%(course_key)s AND %(video_iri)s AND %(interactions)s AND %(full_screen)s:true' % {
+        course_key: teachers_common.queries.course_key,
         video_iri: teachers_common.queries.video_iri,
         interactions: teachers_common.queries.interactions,
         full_screen: utils.functions.single_escape_string(common.fields.context.extensions.full_screen),
@@ -615,7 +638,8 @@ dashboard.new(
     targets: [
       {
         datasource: common.datasources.lrs,
-        query: '%(video_iri)s AND %(interactions)s' % {
+        query: '%(course_key)s AND %(video_iri)s AND %(interactions)s' % {
+          course_key: teachers_common.queries.course_key,
           video_iri: teachers_common.queries.video_iri,
           interactions: teachers_common.queries.interactions,
         },
@@ -691,7 +715,8 @@ dashboard.new(
     targets: [
       {
         datasource: common.datasources.lrs,
-        query: '%(video_iri)s AND %(interactions)s' % {
+        query: '%(course_key)s AND %(video_iri)s AND %(interactions)s' % {
+          course_key: teachers_common.queries.course_key,
           video_iri: teachers_common.queries.video_iri,
           interactions: teachers_common.queries.interactions,
         },
@@ -813,7 +838,8 @@ dashboard.new(
     targets: [
       {
         datasource: common.datasources.lrs,
-        query: '%(video_iri)s AND %(interactions)s' % {
+        query: '%(course_key)s AND %(video_iri)s AND %(interactions)s' % {
+          course_key: teachers_common.queries.course_key,
           video_iri: teachers_common.queries.video_iri,
           interactions: teachers_common.queries.interactions,
         },

@@ -81,7 +81,10 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query=teachers_common.queries.course_videos,
+      query='%(course_key)s AND %(course_videos)s' % {
+        course_key: teachers_common.queries.course_key,
+        course_videos: teachers_common.queries.course_videos,
+      },
       metrics=[utils.metrics.count],
       bucketAggs=[
         {
@@ -124,7 +127,8 @@ dashboard.new(
     elasticsearch.target(
       alias='Views',
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND %(views)s' % {
+      query='%(course_key)s AND %(course_videos)s AND %(views)s' % {
+        course_key: teachers_common.queries.course_key,
         course_videos: teachers_common.queries.course_videos,
         views: teachers_common.queries.views,
       },
@@ -136,7 +140,8 @@ dashboard.new(
     elasticsearch.target(
       alias='Complete views',
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND %(complete_views)s' % {
+      query='%(course_key)s AND %(course_videos)s AND %(complete_views)s' % {
+        course_key: teachers_common.queries.course_key,
         course_videos: teachers_common.queries.course_videos,
         complete_views: teachers_common.queries.complete_views,
       },
@@ -148,7 +153,8 @@ dashboard.new(
     elasticsearch.target(
       alias='Downloads',
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND %(downloads)s' % {
+      query='%(course_key)s AND %(course_videos)s AND %(downloads)s' % {
+        course_key: teachers_common.queries.course_key,
         course_videos: teachers_common.queries.course_videos,
         downloads: teachers_common.queries.downloads,
       },
@@ -176,7 +182,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND %(views)s' % {
+      query='%(course_key)s AND %(course_videos)s AND %(views)s' % {
+        course_key: teachers_common.queries.course_key,
         course_videos: teachers_common.queries.course_videos,
         views: teachers_common.queries.views,
       },
@@ -201,7 +208,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND %(views)s' % {
+      query='%(course_key)s AND %(course_videos)s AND %(views)s' % {
+        course_key: teachers_common.queries.course_key,
         course_videos: teachers_common.queries.course_videos,
         views: teachers_common.queries.views,
       },
@@ -236,7 +244,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND %(views)s' % {
+      query='%(course_key)s AND %(course_videos)s AND %(views)s' % {
+        course_key: teachers_common.queries.course_key,
         course_videos: teachers_common.queries.course_videos,
         views: teachers_common.queries.views,
       },
@@ -272,7 +281,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND %(complete_views)s' % {
+      query='%(course_key)s AND %(course_videos)s AND %(complete_views)s' % {
+        course_key: teachers_common.queries.course_key,
         course_videos: teachers_common.queries.course_videos,
         complete_views: teachers_common.queries.complete_views,
       },
@@ -297,7 +307,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND %(complete_views)s' % {
+      query='%(course_key)s AND %(course_videos)s AND %(complete_views)s' % {
+        course_key: teachers_common.queries.course_key,
         course_videos: teachers_common.queries.course_videos,
         complete_views: teachers_common.queries.complete_views,
       },
@@ -332,7 +343,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND %(complete_views)s' % {
+      query='%(course_key)s AND %(course_videos)s AND %(complete_views)s' % {
+        course_key: teachers_common.queries.course_key,
         course_videos: teachers_common.queries.course_videos,
         complete_views: teachers_common.queries.complete_views,
       },
@@ -366,7 +378,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND %(downloads)s' % {
+      query='%(course_key)s AND %(course_videos)s AND %(downloads)s' % {
+        course_key: teachers_common.queries.course_key,
         course_videos: teachers_common.queries.course_videos,
         downloads: teachers_common.queries.downloads,
       },
@@ -391,7 +404,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND %(downloads)s' % {
+      query='%(course_key)s AND %(course_videos)s AND %(downloads)s' % {
+        course_key: teachers_common.queries.course_key,
         course_videos: teachers_common.queries.course_videos,
         downloads: teachers_common.queries.downloads,
       },
@@ -426,7 +440,8 @@ dashboard.new(
   ).addTarget(
     elasticsearch.target(
       datasource=common.datasources.lrs,
-      query='%(course_videos)s AND %(downloads)s' % {
+      query='%(course_key)s AND %(course_videos)s AND %(downloads)s' % {
+        course_key: teachers_common.queries.course_key,
         course_videos: teachers_common.queries.course_videos,
         downloads: teachers_common.queries.downloads,
       },
@@ -588,7 +603,8 @@ dashboard.new(
             type: 'count',
           },
         ],
-        query: '%(course_videos)s AND %(views)s' % {
+        query: '%(course_key)s AND %(course_videos)s AND %(views)s' % {
+          course_key: teachers_common.queries.course_key,
           course_videos: teachers_common.queries.course_videos,
           views: teachers_common.queries.views,
         },
@@ -655,7 +671,8 @@ dashboard.new(
         ],
         datasource: common.datasources.lrs,
         metrics: [utils.metrics.cardinality(common.fields.actor.account.name)],
-        query: '%(course_videos)s AND %(views)s' % {
+        query: '%(course_key)s AND %(course_videos)s AND %(views)s' % {
+          course_key: teachers_common.queries.course_key,
           course_videos: teachers_common.queries.course_videos,
           views: teachers_common.queries.views,
         },
@@ -678,7 +695,8 @@ dashboard.new(
         ],
         datasource: common.datasources.lrs,
         metrics: [utils.metrics.count],
-        query: '%(course_videos)s AND %(complete_views)s' % {
+        query: '%(course_key)s AND %(course_videos)s AND %(complete_views)s' % {
+          course_key: teachers_common.queries.course_key,
           course_videos: teachers_common.queries.course_videos,
           complete_views: teachers_common.queries.complete_views,
         },
@@ -701,7 +719,8 @@ dashboard.new(
         ],
         datasource: common.datasources.lrs,
         metrics: [utils.metrics.cardinality(common.fields.actor.account.name)],
-        query: '%(course_videos)s AND %(complete_views)s' % {
+        query: '%(course_key)s AND %(course_videos)s AND %(complete_views)s' % {
+          course_key: teachers_common.queries.course_key,
           course_videos: teachers_common.queries.course_videos,
           complete_views: teachers_common.queries.complete_views,
         },
