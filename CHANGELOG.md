@@ -8,6 +8,10 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+### Fixed
+
+- Restrict video analytics to current course context
+
 ## [1.2.1] - 2024-03-18
 
 ### Added
