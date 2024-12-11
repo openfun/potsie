@@ -29,7 +29,8 @@ $ make run
 
 After a few seconds, the application should be running at
 [localhost:3000](http://localhost:3000). Default admin credentials are
-`admin:pass`. Once logged in, running grafana instance should be provisioned
+`admin:pass`. If you want to see the provisionned dashboards, connect with the user `teacher:funfunfun`.
+Once logged in, running grafana instance should be provisioned
 with all dashboards versioned in this repository.
 
 ## Developer guide
