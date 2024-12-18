@@ -8,6 +8,8 @@ Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to
 
 ## [Unreleased]
 
+## [1.2.2] - 2024-12-18
+
 ### Fixed
 
 - Restrict video analytics to current course context
@@ -181,7 +183,8 @@ with corresponding Teachers Course Video Details Dashboard
 
 - Video details Dashboard
 
-[unreleased]: https://github.com/openfun/potsie/compare/v1.2.1...main
+[unreleased]: https://github.com/openfun/potsie/compare/v1.2.2...main
+[1.2.2]: https://github.com/openfun/potsie/compare/v1.2.1...v1.2.2
 [1.2.1]: https://github.com/openfun/potsie/compare/v1.2.0...v1.2.1
 [1.2.0]: https://github.com/openfun/potsie/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/openfun/potsie/compare/v1.0.0...v1.1.0
